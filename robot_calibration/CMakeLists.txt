@@ -71,15 +71,41 @@ add_executable(calibrate_base src/calibrate_base.cpp)
 target_link_libraries(calibrate_base ${Boost_LIBRARIES}
                                      ${catkin_LIBRARIES})
 
-add_library(robot_calibration src/calibration_offset_parser.cpp
-                              src/chain_manager.cpp
-                              src/checkerboard_finder.cpp
-                              src/feature_finder.cpp
-                              src/led_finder.cpp
-                              src/ground_plane_finder.cpp	
-                              src/models.cpp
-                              src/optimization_params.cpp
-                              src/optimizer.cpp)
+set(HEADERS
+    include/${PROJECT_NAME}/capture/chain_manager.h
+    include/${PROJECT_NAME}/capture/checkerboard_finder.h
+    include/${PROJECT_NAME}/capture/depth_camera.h
+    include/${PROJECT_NAME}/capture/feature_finder.h
+    include/${PROJECT_NAME}/capture/ground_plane_finder.h
+    include/${PROJECT_NAME}/capture/led_finder.h
+    include/${PROJECT_NAME}/ceres/camera3d_to_arm_error.h
+    include/${PROJECT_NAME}/ceres/data_functions.h
+    include/${PROJECT_NAME}/ceres/ground_plane_error.h
+    include/${PROJECT_NAME}/ceres/optimization_params.h
+    include/${PROJECT_NAME}/ceres/optimizer.h
+    include/${PROJECT_NAME}/ceres/outrageous_error.h
+    include/${PROJECT_NAME}/models/camera3d.h
+    include/${PROJECT_NAME}/models/chain.h
+    include/${PROJECT_NAME}/calibration_offset_parser.h
+    include/${PROJECT_NAME}/camera_info.h
+)
+
+set(SOURCES
+    src/calibration_offset_parser.cpp
+    src/chain_manager.cpp
+    src/checkerboard_finder.cpp
+    src/feature_finder.cpp
+    src/led_finder.cpp
+    src/ground_plane_finder.cpp
+    src/models.cpp
+    src/optimization_params.cpp
+    src/optimizer.cpp
+)
+
+add_library(robot_calibration
+  ${SOURCES}
+  ${HEADERS}
+ )
 target_link_libraries(robot_calibration ${Boost_LIBRARIES}
                                         ${catkin_LIBRARIES}
                                         ${CERES_LIBRARIES}
