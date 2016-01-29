@@ -26,7 +26,7 @@ namespace robot_calibration
 
 /**
  *  \brief Combined parser and configuration for calibration offsets.
- *         Holds the configuration of what is to be calibrated, and
+ *         Holds the configuration of what is to be calibrated,
  *         and parses the actual adjustments from the free parameters.
  */
 class CalibrationOffsetParser

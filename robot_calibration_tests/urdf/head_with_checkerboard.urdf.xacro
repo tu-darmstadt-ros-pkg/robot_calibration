@@ -1,0 +1,58 @@
+<?xml version="1.0" ?>
+
+<robot xmlns:xacro="http://ros.org/wiki/xacro" name="hector_multisensor_head">
+  <xacro:include filename="$(find hector_components_description)/urdf/hector_multisensor_head.urdf.xacro" /> 
+  
+  <xacro:include filename="$(find hector_components_description)/urdf/checkerboard.urdf.xacro" />
+
+  <link name="world"/>
+  
+  <joint name="fixed1" type="fixed">
+    <parent link="world"/>
+    <child link="base"/>
+    <origin xyz="0.0 0.0 0.5" rpy="0 0 0"/>
+  </joint>
+  
+  <link name="base" >
+    <origin xyz="0.0 0.0 0.0" rpy="0 0 0"/>
+    <visual>
+      <geometry>
+            <cylinder length="1" radius="0.045"/>
+      </geometry>
+    </visual>
+     <collision>
+      <geometry>
+            <cylinder length="1" radius="0.045"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="fixed2" type="fixed">
+    <parent link="base"/>
+    <child link="head_link"/>
+    <origin xyz="0.0 0.0 0.5" rpy="0 0 0"/>
+  </joint>
+  
+  <hector_multisensor_head_macro parent="base"  name="head" scaling="0.001">
+    <origin xyz="0.0 0.0 0" rpy="${M_PI*0.5} 0 ${M_PI*0.5}"/> 
+    <!-- Calibrated origin -->
+    <xacro:if value="$(optenv THOR_REAL_ROBOT false)">
+      <xacro:include filename="$(find thor_mang_description)/head_lidar_calibration/calibration.urdf.xacro" />
+    </xacro:if>
+
+    <xacro:unless value="$(optenv THOR_REAL_ROBOT false)">
+      <xacro:include filename="$(find thor_mang_description)/head_lidar_calibration/zero_calibration.urdf.xacro" />
+    </xacro:unless>  
+  </hector_multisensor_head_macro>
+  
+  <checkerboard parent="head_cam_link" name="head" scaling="1.0">
+    <origin xyz="2 0 0" rpy="0 0 0" />
+  </checkerboard>
+  
+    <gazebo>
+      <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+        <robotNamespace>thor_mang</robotNamespace>
+      </plugin>
+    </gazebo>
+</robot>
+

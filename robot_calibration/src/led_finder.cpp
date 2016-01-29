@@ -146,9 +146,6 @@ bool LedFinder::find(robot_calibration_msgs::CalibrationData * msg)
 {
   uint8_t code_idx = -1;
 
-  std::vector<geometry_msgs::PointStamped> rgbd;
-  std::vector<geometry_msgs::PointStamped> world;
-
   sensor_msgs::PointCloud2 prev_cloud;
 
   robot_calibration_msgs::GripperLedCommandGoal command;
@@ -271,7 +268,7 @@ bool LedFinder::find(robot_calibration_msgs::CalibrationData * msg)
       listener_.transformPoint(trackers_[t].frame_, ros::Time(0), rgbd_pt,
                                rgbd_pt.header.frame_id, world_pt);
     }
-    catch(const tf::TransformException &ex)
+    catch(const tf::TransformException)
     {
       ROS_ERROR_STREAM("Failed to transform feature to " << trackers_[t].frame_);
       return false;

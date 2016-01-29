@@ -22,6 +22,7 @@
 
 #include <ros/ros.h>
 #include <sensor_msgs/CameraInfo.h>
+#include <geometry_msgs/Point.h>
 
 namespace robot_calibration
 {
@@ -68,6 +69,18 @@ inline sensor_msgs::CameraInfo updateCameraInfo(double camera_fx, double camera_
   new_info.K[CAMERA_INFO_K_FY_INDEX] = new_info.P[CAMERA_INFO_P_FY_INDEX];
 
   return new_info;
+}
+
+inline geometry_msgs::Point projectPose(const sensor_msgs::CameraInfo& camera_info, const geometry_msgs::Point& point) {
+  double fx = camera_info.P[CAMERA_INFO_P_FX_INDEX];
+  double fy = camera_info.P[CAMERA_INFO_P_FY_INDEX];
+  double cx = camera_info.P[CAMERA_INFO_P_CX_INDEX];
+  double cy = camera_info.P[CAMERA_INFO_P_CY_INDEX];
+
+  geometry_msgs::Point point2d;
+  point2d.x = (fx*point.x) / point.z + cx;
+  point2d.y = (fy*point.y) / point.z + cy;
+  return point2d;
 }
 
 }  // namespace robot_calibration
