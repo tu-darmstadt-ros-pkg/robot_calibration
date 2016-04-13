@@ -34,6 +34,7 @@ find_package(catkin REQUIRED
     sensor_msgs
     std_msgs
     tf
+    visualization_msgs
 )
 
 catkin_package(
@@ -53,6 +54,7 @@ catkin_package(
     sensor_msgs
     std_msgs
     tf
+    visualization_msgs
   DEPENDS
     Boost
     Ceres

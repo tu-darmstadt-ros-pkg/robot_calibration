@@ -304,6 +304,7 @@ std::vector<geometry_msgs::PointStamped> Camera2dModel::project(
 
     points[i].point.x = data.observations[sensor_idx].features[i].point.x;
     points[i].point.y = data.observations[sensor_idx].features[i].point.y;
+    points[i].header.frame_id = data.observations[sensor_idx].features[i].header.frame_id;
   }
 
   return points;

@@ -70,8 +70,8 @@ struct Camera2dToArmError
     // Camera observations on image plane
     std::vector<geometry_msgs::PointStamped> camera_pts =
         camera_model_->project(data_, *offsets_);
-
     // Project the arm estimation to image frame
+
     std::vector<geometry_msgs::PointStamped> arm_pts =
         arm_model_->project(data_, *offsets_);
 
@@ -91,6 +91,7 @@ struct Camera2dToArmError
       geometry_msgs::Point img_point = projectPose(camera_model_->getCameraInfo(), arm_pts[i].point);
       residuals[(2*i)+0] = camera_pts[i].point.x - img_point.x;
       residuals[(2*i)+1] = camera_pts[i].point.y - img_point.y;
+//      ROS_INFO_STREAM("Residuals: " << residuals[(2*i)+0] << "; " << residuals[(2*i)+1]);
     }
 
     return true;  // always return true
@@ -109,6 +110,7 @@ struct Camera2dToArmError
                                      CalibrationOffsetParser* offsets,
                                      robot_calibration_msgs::CalibrationData& data)
   {
+//    ROS_INFO_STREAM("Creating residual");
     int index = -1;
     for (size_t k = 0; k < data.observations.size() ; k++)
     {

@@ -186,6 +186,7 @@ int main(int argc, char** argv)
       }
 
       // Regardless of manual vs. automatic, wait for joints to settle
+      ROS_INFO_STREAM("Waiting for joints to settle.");
       chain_manager_.waitToSettle();
 
       // Make sure sensor data is up to date after settling
@@ -195,6 +196,7 @@ int main(int argc, char** argv)
       bool found_all_features = true;
       if (poses.size() == 0)
       {
+        ROS_INFO_STREAM("Looking for features now..");
         // In manual mode, we need to capture all features
         for (robot_calibration::FeatureFinderMap::iterator it = finders_.begin();
              it != finders_.end();

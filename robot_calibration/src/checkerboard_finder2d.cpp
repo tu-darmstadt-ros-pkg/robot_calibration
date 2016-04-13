@@ -25,6 +25,7 @@ CheckerboardFinder2D::CheckerboardFinder2D(ros::NodeHandle & nh) :
 
   // Publish where checkerboard points were seen
   corners_pub_ = nh.advertise<sensor_msgs::Image>("checkerboard_corners", 10);
+  corner_pose_pub_ = nh.advertise<visualization_msgs::MarkerArray>("checkerboard_corner_poses", 10);
 
   // Setup to get camera depth info
   if (!rgb_camera_manager_.init(nh))
@@ -32,6 +33,48 @@ CheckerboardFinder2D::CheckerboardFinder2D(ros::NodeHandle & nh) :
     // Error will be printed in manager
     throw;
   }
+}
+
+void CheckerboardFinder2D::publishCornerPoses(const std::vector<geometry_msgs::PointStamped>& features) {
+  visualization_msgs::MarkerArray array;
+  for (unsigned int i = 0; i < features.size(); i++) {
+    visualization_msgs::Marker marker;
+    marker.header.frame_id = features[i].header.frame_id;
+    marker.header.stamp = ros::Time::now();
+
+    marker.ns = "corners";
+    marker.id = i;
+
+    // Set the marker type.  Initially this is CUBE, and cycles between that and SPHERE, ARROW, and CYLINDER
+    marker.type = visualization_msgs::Marker::CUBE;
+
+    // Set the marker action.  Options are ADD, DELETE, and new in ROS Indigo: 3 (DELETEALL)
+    marker.action = visualization_msgs::Marker::ADD;
+
+    // Set the pose of the marker.  This is a full 6DOF pose relative to the frame/time specified in the header
+    marker.pose.position.x = features[i].point.x;
+    marker.pose.position.y = features[i].point.y;
+    marker.pose.position.z = features[i].point.z;
+    marker.pose.orientation.x = 0.0;
+    marker.pose.orientation.y = 0.0;
+    marker.pose.orientation.z = 0.0;
+    marker.pose.orientation.w = 1.0;
+
+    // Set the scale of the marker -- 1x1x1 here means 1m on a side
+    marker.scale.x = 0.005;
+    marker.scale.y = 0.005;
+    marker.scale.z = 0.005;
+
+    // Set the color -- be sure to set alpha to something non-zero!
+    marker.color.r = 0.0f;
+    marker.color.g = 1.0f;
+    marker.color.b = 0.0f;
+    marker.color.a = 1.0;
+
+    marker.lifetime = ros::Duration();
+    array.markers.push_back(marker);
+  }
+  corner_pose_pub_.publish(array);
 }
 
 void CheckerboardFinder2D::cameraCallback(const sensor_msgs::Image &image)
@@ -110,7 +153,10 @@ bool CheckerboardFinder2D::findInternal(robot_calibration_msgs::CalibrationData 
 
   ROS_INFO_STREAM("Found corners: " << corners.size());
 
-  cv::drawChessboardCorners(cv_image->image, checkerboard_size, cv::Mat(corners), found);
+  std::vector<cv::Point2f> corners_small;
+  corners_small.push_back(corners[12]);
+
+  cv::drawChessboardCorners(cv_image->image, checkerboard_size, cv::Mat(corners_small), found);
   sensor_msgs::ImagePtr corner_image_ptr(cv_image->toImageMsg());
   corners_pub_.publish(*corner_image_ptr);
 
@@ -130,13 +176,13 @@ bool CheckerboardFinder2D::findInternal(robot_calibration_msgs::CalibrationData 
 
     // Fill in the headers
     rgb.header = image_.header;
-    world.header.frame_id = "checkerboard";
+    world.header.frame_id = "base_checkerboard_link";
 
     // Fill in message
     for (size_t i = 0; i < corners.size(); ++i)
     {
-      world.point.z = (i % points_x_) * -square_size_;
-      world.point.x = (i / points_x_) * -square_size_;
+      world.point.y = (i % points_x_) * square_size_ - points_x_*square_size_/2 + square_size_/2;
+      world.point.z = (i / points_x_) * square_size_ - points_y_*square_size_/2 + square_size_/2;
 
       rgb.point.x = corners[i].x;
       rgb.point.y = corners[i].y;
@@ -154,8 +200,11 @@ bool CheckerboardFinder2D::findInternal(robot_calibration_msgs::CalibrationData 
       msg->observations[0].features[i] = rgb;
       msg->observations[0].ext_camera_info = rgb_camera_manager_.getCameraInfo();
       msg->observations[1].features[i] = world;
-
     }
+
+    std::vector<geometry_msgs::PointStamped> features_small;
+    features_small.push_back(msg->observations[1].features[12]);
+    publishCornerPoses(features_small);
 
     // Add debug cloud to message
     if (output_debug_)

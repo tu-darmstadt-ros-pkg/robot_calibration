@@ -34,6 +34,7 @@
 #include <robot_calibration/capture/feature_finder.h>
 #include <robot_calibration_msgs/CalibrationData.h>
 #include <robot_calibration/capture/rgb_camera.h>
+#include <visualization_msgs/MarkerArray.h>
 
 #include <opencv2/calib3d/calib3d.hpp>
 #include <cv_bridge/cv_bridge.h>
@@ -63,9 +64,11 @@ private:
 
   void cameraCallback(const sensor_msgs::Image& image);
   bool waitForImage();
+  void publishCornerPoses(const std::vector<geometry_msgs::PointStamped>& features);
 
-  ros::Subscriber image_sub_;  /// Incoming sensor_msgs::PointCloud2
-  ros::Publisher corners_pub_;   /// Outgoing sensor_msgs::PointCloud2
+  ros::Subscriber image_sub_;  /// Incoming sensor_msgs::Image
+  ros::Publisher corners_pub_;   /// Outgoing sensor_msgs::Image
+  ros::Publisher corner_pose_pub_;
 
   bool waiting_;
   sensor_msgs::Image image_;
