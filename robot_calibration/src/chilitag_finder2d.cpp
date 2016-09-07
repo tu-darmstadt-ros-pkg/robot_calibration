@@ -13,7 +13,8 @@ ChilitagFinder2D::ChilitagFinder2D(ros::NodeHandle & nh) :
 
   detector_.setPerformance(chilitags::Chilitags::ROBUST);
 
-  // TODO which parameters are needed?
+  // Load parameters
+  nh.param<int>("size", marker_size_, 0.03);
 
   // Should we output debug image/cloud
   nh.param<bool>("debug", output_debug_, false);
