@@ -35,8 +35,8 @@ namespace robot_calibration
 class FeatureFinder
 {
 public:
-  FeatureFinder(ros::NodeHandle & n) {};
-  virtual ~FeatureFinder() {};
+  FeatureFinder(ros::NodeHandle & n) {}
+  virtual ~FeatureFinder() {}
 
   virtual bool find(robot_calibration_msgs::CalibrationData * msg) = 0;
 };

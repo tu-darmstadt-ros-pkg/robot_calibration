@@ -21,6 +21,7 @@
 #include <robot_calibration/capture/checkerboard_finder.h>
 #include <robot_calibration/capture/checkerboard_finder2d.h>
 #include <robot_calibration/capture/ground_plane_finder.h>
+#include <robot_calibration/capture/chilitag_finder2d.h>
 
 namespace robot_calibration
 {
@@ -87,6 +88,11 @@ bool loadFeatureFinders(ros::NodeHandle& nh,
     {
       ROS_INFO("  New robot_calibration/CheckerboardFinder2D: %s", name.c_str());
       finder.reset(new robot_calibration::CheckerboardFinder2D(finder_handle));
+    }
+    else if (type == "robot_calibration/ChilitagFinder2D")
+    {
+      ROS_INFO("  New robot_calibration/ChilitagFinder2D: %s", name.c_str());
+      finder.reset(new robot_calibration::ChilitagFinder2D(finder_handle));
     }
     else
     {

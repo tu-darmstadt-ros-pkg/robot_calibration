@@ -5,6 +5,8 @@ if (CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
 endif()
 
+add_definitions(-std=c++11)
+
 find_package(Boost REQUIRED system thread)
 
 find_library(tinyxml_library tinyxml)
@@ -16,6 +18,9 @@ find_path(tinyxml_include_dirs NAMES tinyxml.h PATH_SUFFIXES tinyxml)
 if (NOT tinyxml_include_dirs)
    message (STATUS "Looking for tinyxml/tinyxml.hpp or tinyxml/tinyxml.h - not found.")
 endif ()
+
+find_package(PkgConfig)
+pkg_search_module(CHILITAGS REQUIRED chilitags)
 
 find_package(orocos_kdl)
 find_package(Ceres REQUIRED)
@@ -59,6 +64,7 @@ catkin_package(
     Boost
     Ceres
     orocos_kdl
+    chilitags
   LIBRARIES
     robot_calibration
 )
@@ -66,7 +72,8 @@ catkin_package(
 include_directories(include ${Boost_INCLUDE_DIRS}
                             ${catkin_INCLUDE_DIRS}
                             ${CERES_INCLUDES}
-                            ${orocos_kdl_INCLUDE_DIRS})
+                            ${orocos_kdl_INCLUDE_DIRS}
+                            ${CHILITAGS_INCLUDE_DIRS})
 link_directories(${orocos_kdl_LIBRARY_DIRS}) # this is a hack, will eventually be unneeded once orocos-kdl is fixed
 
 add_executable(calibrate_base src/calibrate_base.cpp)
@@ -77,6 +84,7 @@ set(HEADERS
     include/${PROJECT_NAME}/capture/chain_manager.h
     include/${PROJECT_NAME}/capture/checkerboard_finder.h
     include/${PROJECT_NAME}/capture/checkerboard_finder2d.h
+    include/${PROJECT_NAME}/capture/chilitag_finder2d.h
     include/${PROJECT_NAME}/capture/depth_camera.h
     include/${PROJECT_NAME}/capture/rgb_camera.h
     include/${PROJECT_NAME}/capture/feature_finder.h
@@ -101,6 +109,7 @@ set(SOURCES
     src/chain_manager.cpp
     src/checkerboard_finder.cpp
     src/checkerboard_finder2d.cpp
+    src/chilitag_finder2d.cpp
     src/feature_finder.cpp
     src/led_finder.cpp
     src/ground_plane_finder.cpp
@@ -118,16 +127,12 @@ target_link_libraries(robot_calibration ${Boost_LIBRARIES}
                                         ${catkin_LIBRARIES}
                                         ${CERES_LIBRARIES}
                                         ${tinyxml_LIBRARIES}
-                                        ${orocos_kdl_LIBRARIES})
+                                        ${orocos_kdl_LIBRARIES}
+                                        ${CHILITAGS_LDFLAGS})
 add_dependencies(robot_calibration robot_calibration_msgs_gencpp)
 
 add_executable(calibrate src/calibrate.cpp)
-target_link_libraries(calibrate robot_calibration
-                                ${Boost_LIBRARIES}
-                                ${catkin_LIBRARIES}
-                                ${CERES_LIBRARIES}
-                                ${tinyxml_LIBRARIES}
-                                ${orocos_kdl_LIBRARIES})
+target_link_libraries(calibrate robot_calibration)
 add_dependencies(calibrate robot_calibration)
 
 add_subdirectory(test)
