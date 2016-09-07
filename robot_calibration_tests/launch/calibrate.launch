@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<launch>
+  <node pkg="robot_calibration" type="calibrate" name="robot_calibration" args="--manual" output="screen" launch-prefix="">
+    <param name="velocity_factor" value="1" />
+    <rosparam file="$(find argo_camera_to_arm_calibration)/config/capture.yaml" command="load" />
+    <rosparam file="$(find argo_camera_to_arm_calibration)/config/calibrate.yaml" command="load" />
+    
+    <remap from="/head_camera/rgb/camera_info" to="/arm_zoom_cam/camera_info" />
+    <remap from="~/features/checkerboard_finder/image" to="/arm_zoom_cam/image_raw"/>
+  </node>
+</launch>
