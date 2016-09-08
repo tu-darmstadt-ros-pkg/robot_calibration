@@ -1,20 +1,17 @@
 chains:
   - name: arm
-    topic: /argonaut_robot/arm_traj_controller/follow_joint_trajectory
+    topic: /arm_control/arm_traj_controller/follow_joint_trajectory/goal
     joints:
      - arm_joint_0
      - arm_joint_1
      - arm_joint_2
      - arm_joint_3
-     - arm_joint_4
-    planning_group: arm
+    planning_group: arm #arm_group
 duration: 2.0
 features:
-  checkerboard_finder:
-    type: robot_calibration/CheckerboardFinder2D
-    points_x: 8
-    points_y: 6
-    size: 0.010625
+  chilitag_finder:
+    type: robot_calibration/ChilitagFinder2D
+    size: 0.03
     debug: true
     camera_sensor_name: camera
     chain_sensor_name: arm

@@ -11,7 +11,7 @@ ChilitagFinder2D::ChilitagFinder2D(ros::NodeHandle & nh) :
   // Setup Scriber
   image_sub_ = nh.subscribe("image", 1, &ChilitagFinder2D::cameraCallback, this);
 
-  detector_.setPerformance(chilitags::Chilitags::ROBUST);
+  detector_.setPerformance(chilitags::Chilitags::FAST);
 
   // Load parameters
   nh.param<int>("size", marker_size_, 0.03);
@@ -134,7 +134,7 @@ bool ChilitagFinder2D::findInternal(robot_calibration_msgs::CalibrationData * ms
   cv_bridge::CvImagePtr cv_image;
   try
   {
-    cv_image = cv_bridge::toCvCopy(image_, "mono8");  // TODO: was rgb8? does this work?
+    cv_image = cv_bridge::toCvCopy(image_);  // TODO: was rgb8? does this work?
   }
   catch(cv_bridge::Exception& e)
   {
@@ -148,6 +148,12 @@ bool ChilitagFinder2D::findInternal(robot_calibration_msgs::CalibrationData * ms
   bool found = (map.size() > 0);
 
   ROS_INFO_STREAM("Found " << map.size() << " tags.");
+  std::stringstream ids_ss;
+  ids_ss << "Found ids: ";
+  for (auto& kv: map) {
+    ids_ss << kv.first << " ";
+  }
+  ROS_INFO_STREAM(ids_ss.str());
 
   drawTags(cv_image->image, map);
   sensor_msgs::ImagePtr corner_image_ptr(cv_image->toImageMsg());
@@ -176,7 +182,9 @@ bool ChilitagFinder2D::findInternal(robot_calibration_msgs::CalibrationData * ms
     int counter = 0;
     for (auto& kv : map)
     {
-        world.header.frame_id = "chilitag" + std::to_string(kv.first) + "_link";
+//        world.header.frame_id = "chilitag" + std::to_string(kv.first) + "_link";
+
+        world.header.frame_id = "chilitag1_link";
 
         chilitags::Quad positions = kv.second;
 

@@ -1,22 +1,22 @@
 verbose: true
-base_link: arm_zoom_cam_optical_frame
+base_link: gripper_cam_optical_frame
 models:
  - name: arm
    type: chain
-   frame: base_checkerboard_link
+   frame: chilitag1_link
  - name: camera
    type: camera2d
-   frame: arm_zoom_cam_optical_frame
+   frame: gripper_cam_optical_frame
 free_params:
  - arm_joint_0
-free_frames:
- - name: base_checkerboard_link
-   x: false
-   y: false
-   z: false
-   roll: false
-   pitch: false
-   yaw: false
+#free_frames:
+# - name: base_chilitag_link
+#   x: false
+#   y: false
+#   z: false
+#   roll: false
+#   pitch: false
+#   yaw: falses
 error_blocks:
  - name: hand_eye
    type: camera2d_to_arm
