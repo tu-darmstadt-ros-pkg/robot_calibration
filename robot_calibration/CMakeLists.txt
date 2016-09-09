@@ -40,6 +40,7 @@ find_package(catkin REQUIRED
     std_msgs
     tf
     visualization_msgs
+    chilitags_catkin
 )
 
 catkin_package(
