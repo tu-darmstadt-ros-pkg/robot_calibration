@@ -72,7 +72,7 @@ std::vector<geometry_msgs::PointStamped> ChainModel::project(
   // Resize to match # of features
   points.resize(data.observations[sensor_idx].features.size());
 
-  KDL::Frame fk = getChainFK(offsets, data.joint_states);
+
 
   for (size_t i = 0; i < points.size(); ++i)
   {
@@ -83,15 +83,17 @@ std::vector<geometry_msgs::PointStamped> ChainModel::project(
     p.p.y(data.observations[sensor_idx].features[i].point.y);
     p.p.z(data.observations[sensor_idx].features[i].point.z);
 
-    if (data.observations[sensor_idx].features[i].header.frame_id != tip_)
-    {
-      KDL::Frame p2(KDL::Frame::Identity());
-      if (offsets.getFrame(data.observations[sensor_idx].features[i].header.frame_id, p2))
-      {
-        p = p2 * p;
-      }
-    }
+//    if (data.observations[sensor_idx].features[i].header.frame_id != tip_)
+//    {
+//      KDL::Frame p2(KDL::Frame::Identity());
+//      if (offsets.getFrame(data.observations[sensor_idx].features[i].header.frame_id, p2))
+//      {
+//        p = p2 * p;
+//      }
+//    }
 
+    // transform observation to root frame based on frame_id
+    KDL::Frame fk = getChainFK(data.observations[sensor_idx].features[i].header.frame_id, offsets, data.joint_states);
     p = fk * p;
 
     points[i].point.x = p.p.x();
@@ -102,7 +104,8 @@ std::vector<geometry_msgs::PointStamped> ChainModel::project(
   return points;
 }
 
-KDL::Frame ChainModel::getChainFK(const CalibrationOffsetParser& offsets,
+KDL::Frame ChainModel::getChainFK(std::string frame_id,
+                                  const CalibrationOffsetParser& offsets,
                                   const sensor_msgs::JointState& state)
 {
   // FK from root to tip
