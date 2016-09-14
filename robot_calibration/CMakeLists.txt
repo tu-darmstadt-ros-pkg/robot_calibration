@@ -19,8 +19,10 @@ if (NOT tinyxml_include_dirs)
    message (STATUS "Looking for tinyxml/tinyxml.hpp or tinyxml/tinyxml.h - not found.")
 endif ()
 
-find_package(PkgConfig)
-pkg_search_module(CHILITAGS REQUIRED chilitags)
+#find_package(PkgConfig)
+#pkg_search_module(CHILITAGS REQUIRED chilitags)
+
+find_package(chilitags REQUIRED)
 
 find_package(orocos_kdl)
 find_package(Ceres REQUIRED)
@@ -64,7 +66,6 @@ catkin_package(
     Boost
     Ceres
     orocos_kdl
-    chilitags
   LIBRARIES
     robot_calibration
 )
@@ -73,7 +74,7 @@ include_directories(include ${Boost_INCLUDE_DIRS}
                             ${catkin_INCLUDE_DIRS}
                             ${CERES_INCLUDES}
                             ${orocos_kdl_INCLUDE_DIRS}
-                            ${CHILITAGS_INCLUDE_DIRS})
+                            ${chilitags_INCLUDE_DIR})
 link_directories(${orocos_kdl_LIBRARY_DIRS}) # this is a hack, will eventually be unneeded once orocos-kdl is fixed
 
 add_executable(calibrate_base src/calibrate_base.cpp)
@@ -128,7 +129,8 @@ target_link_libraries(robot_calibration ${Boost_LIBRARIES}
                                         ${CERES_LIBRARIES}
                                         ${tinyxml_LIBRARIES}
                                         ${orocos_kdl_LIBRARIES}
-                                        ${CHILITAGS_LDFLAGS})
+                                       # ${CHILITAGS_LDFLAGS}
+                                        ${chilitags_LIBRARIES})
 add_dependencies(robot_calibration robot_calibration_msgs_gencpp)
 
 add_executable(calibrate src/calibrate.cpp)
