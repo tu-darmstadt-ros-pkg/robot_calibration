@@ -12,6 +12,7 @@ features:
   chilitag_finder:
     type: robot_calibration/ChilitagFinder2D
     size: 0.03
+    tag_ids: [1, 2]
     debug: true
     camera_sensor_name: camera
     chain_sensor_name: arm

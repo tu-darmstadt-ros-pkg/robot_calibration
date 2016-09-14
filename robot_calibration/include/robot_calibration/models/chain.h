@@ -130,14 +130,16 @@ public:
    *  \brief Compute the forward kinematics of the chain, based on the
    *         offsets and the joint positions of the state message.
    */
-  KDL::Frame getChainFK(std::string frame_id,
-                        const CalibrationOffsetParser& offsets,
+  KDL::Frame getChainFK(const CalibrationOffsetParser& offsets,
                         const sensor_msgs::JointState& state);
+
+  KDL::Frame getPreFK(std::string frame_id, const sensor_msgs::JointState& state);
 
 private:
   KDL::Chain chain_;
 
 protected:
+  KDL::Tree tree_;
   std::string root_;
   std::string tip_;
   std::string name_;

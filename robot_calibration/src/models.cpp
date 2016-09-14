@@ -39,7 +39,7 @@ double positionFromMsg(const std::string& name,
 }
 
 ChainModel::ChainModel(const std::string& name, KDL::Tree model, std::string root, std::string tip) :
-    root_(root), tip_(tip), name_(name)
+    tree_(model), root_(root), tip_(tip), name_(name)
 {
   // Create a KDL::Chain
   if (!model.getChain(root, tip, chain_))
@@ -93,8 +93,12 @@ std::vector<geometry_msgs::PointStamped> ChainModel::project(
 //    }
 
     // transform observation to root frame based on frame_id
-    KDL::Frame fk = getChainFK(data.observations[sensor_idx].features[i].header.frame_id, offsets, data.joint_states);
-    p = fk * p;
+    // fk from frame_id to tip_frame
+    KDL::Frame pre_fk = getPreFK(data.observations[sensor_idx].features[i].header.frame_id, data.joint_states);
+
+    // fk from tip frame to root frame
+    KDL::Frame fk = getChainFK(offsets, data.joint_states);
+    p = fk * pre_fk * p;
 
     points[i].point.x = p.p.x();
     points[i].point.y = p.p.y();
@@ -104,8 +108,35 @@ std::vector<geometry_msgs::PointStamped> ChainModel::project(
   return points;
 }
 
-KDL::Frame ChainModel::getChainFK(std::string frame_id,
-                                  const CalibrationOffsetParser& offsets,
+KDL::Frame ChainModel::getPreFK(std::string frame_id, const sensor_msgs::JointState &state) {
+  // FK from tip to frame_id
+  KDL::Frame p_out = KDL::Frame::Identity();
+
+  KDL::Chain chain;
+  if (!tree_.getChain(tip_, frame_id, chain)) {
+    std::cerr << "Failed to get chain from " << tip_ << " to " << frame_id << std::endl;
+    return p_out;
+  }
+  //std::cout << "Transforming point from " << frame_id << " to " << tip_ << std::endl;
+
+  // Step through joints
+  for (size_t i = 0; i < chain.getNrOfSegments(); ++i)
+  {
+    std::string name = chain.getSegment(i).getJoint().getName();
+    if (chain.getSegment(i).getJoint().getType() != KDL::Joint::None)
+    {
+      double p = positionFromMsg(name, state);
+      p_out = p_out * chain.getSegment(i).pose(p);
+    }
+    else
+    {
+      p_out = p_out * chain.getSegment(i).pose(0.0);
+    }
+  }
+  return p_out;
+}
+
+KDL::Frame ChainModel::getChainFK(const CalibrationOffsetParser& offsets,
                                   const sensor_msgs::JointState& state)
 {
   // FK from root to tip

@@ -197,9 +197,9 @@ bool CheckerboardFinder2D::findInternal(robot_calibration_msgs::CalibrationData 
         return false;
       }
 
-      msg->observations[0].features[i] = rgb;
-      msg->observations[0].ext_camera_info = rgb_camera_manager_.getCameraInfo();
-      msg->observations[1].features[i] = world;
+      msg->observations[idx_cam].features[i] = rgb;
+      msg->observations[idx_cam].ext_camera_info = rgb_camera_manager_.getCameraInfo();
+      msg->observations[idx_chain].features[i] = world;
     }
 
     std::vector<geometry_msgs::PointStamped> features_small;

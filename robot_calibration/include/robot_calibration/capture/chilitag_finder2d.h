@@ -80,6 +80,7 @@ private:
    * ROS Parameters
    */
   int marker_size_;      /// chilitag marker size in m
+  std::vector<int> tag_ids_;
   bool output_debug_;   /// Should we output debug image/cloud?
 
   std::string camera_sensor_name_;

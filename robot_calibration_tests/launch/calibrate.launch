@@ -5,7 +5,7 @@
     <rosparam file="$(find robot_calibration_tests)/config/capture.yaml" command="load" />
     <rosparam file="$(find robot_calibration_tests)/config/calibrate.yaml" command="load" />
     
-    <remap from="~/features/chilitag_finder/image" to="/arm_gripper_cam/image_rect"/>
-    <remap from="/head_camera/rgb/camera_info" to="/arm_gripper_cam/camera_info" />
+    <remap from="~/features/chilitag_finder/image" to="/gripper_cam/image_raw"/>
+    <remap from="/head_camera/rgb/camera_info" to="/gripper_cam/camera_info" />
   </node>
 </launch>

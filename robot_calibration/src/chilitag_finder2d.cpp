@@ -11,10 +11,14 @@ ChilitagFinder2D::ChilitagFinder2D(ros::NodeHandle & nh) :
   // Setup Scriber
   image_sub_ = nh.subscribe("image", 1, &ChilitagFinder2D::cameraCallback, this);
 
-  detector_.setPerformance(chilitags::Chilitags::FAST);
+  detector_.setPerformance(chilitags::Chilitags::ROBUST);
 
   // Load parameters
   nh.param<int>("size", marker_size_, 0.03);
+  nh.param<std::vector<int>>("tag_ids", tag_ids_, std::vector<int>());
+  if (tag_ids_.size() == 0) {
+    ROS_WARN_STREAM("No tag ids set for detection. Detecting all tags (not recommendet).");
+  }
 
   // Should we output debug image/cloud
   nh.param<bool>("debug", output_debug_, false);
@@ -95,7 +99,7 @@ bool ChilitagFinder2D::waitForImage()
 
   waiting_ = true;
   int count = 250;
-  while (--count)
+  while (--count && ros::ok())
   {
     if (!waiting_)
     {
@@ -116,6 +120,8 @@ bool ChilitagFinder2D::find(robot_calibration_msgs::CalibrationData * msg)
   {
     if (findInternal(msg))
       return true;
+    if (!ros::ok())
+      return false;
   }
   ROS_INFO_STREAM("No chilitags found in 50 frames.");
   return false;
@@ -134,7 +140,7 @@ bool ChilitagFinder2D::findInternal(robot_calibration_msgs::CalibrationData * ms
   cv_bridge::CvImagePtr cv_image;
   try
   {
-    cv_image = cv_bridge::toCvCopy(image_);  // TODO: was rgb8? does this work?
+    cv_image = cv_bridge::toCvCopy(image_);
   }
   catch(cv_bridge::Exception& e)
   {
@@ -154,6 +160,16 @@ bool ChilitagFinder2D::findInternal(robot_calibration_msgs::CalibrationData * ms
     ids_ss << kv.first << " ";
   }
   ROS_INFO_STREAM(ids_ss.str());
+
+  for (auto kv = map.cbegin(); kv != map.cend();  ) {
+    // Check if id is in list of valid tag ids
+    if (tag_ids_.size() > 0 && std::find(tag_ids_.begin(), tag_ids_.end(), kv->first) == tag_ids_.end()) {
+      ROS_WARN_STREAM("Erasing id " << kv->first << " because it is not contained in the valid ids list.");
+      map.erase(kv++);
+    } else {
+      ++kv;
+    }
+  }
 
   drawTags(cv_image->image, map);
   sensor_msgs::ImagePtr corner_image_ptr(cv_image->toImageMsg());
@@ -182,9 +198,9 @@ bool ChilitagFinder2D::findInternal(robot_calibration_msgs::CalibrationData * ms
     int counter = 0;
     for (auto& kv : map)
     {
-//        world.header.frame_id = "chilitag" + std::to_string(kv.first) + "_link";
+        world.header.frame_id = "chilitag" + std::to_string(kv.first) + "_link";
 
-        world.header.frame_id = "chilitag1_link";
+//        world.header.frame_id = "chilitag1_link";
 
         chilitags::Quad positions = kv.second;
 
@@ -198,9 +214,9 @@ bool ChilitagFinder2D::findInternal(robot_calibration_msgs::CalibrationData * ms
         rgb.point.y = positions(0, 1);
         rgb.point.z = 0;
 
-        msg->observations[0].features[counter] = rgb;
-        msg->observations[0].ext_camera_info = rgb_camera_manager_.getCameraInfo();
-        msg->observations[1].features[counter] = world;
+        msg->observations[idx_cam].features[counter] = rgb;
+        msg->observations[idx_cam].ext_camera_info = rgb_camera_manager_.getCameraInfo();
+        msg->observations[idx_chain].features[counter] = world;
         counter++;
 
         // top right
@@ -212,9 +228,9 @@ bool ChilitagFinder2D::findInternal(robot_calibration_msgs::CalibrationData * ms
         rgb.point.y = positions(1, 1);
         rgb.point.z = 0;
 
-        msg->observations[0].features[counter] = rgb;
-        msg->observations[0].ext_camera_info = rgb_camera_manager_.getCameraInfo();
-        msg->observations[1].features[counter] = world;
+        msg->observations[idx_cam].features[counter] = rgb;
+        msg->observations[idx_cam].ext_camera_info = rgb_camera_manager_.getCameraInfo();
+        msg->observations[idx_chain].features[counter] = world;
         counter++;
 
         // bottom right
@@ -226,9 +242,9 @@ bool ChilitagFinder2D::findInternal(robot_calibration_msgs::CalibrationData * ms
         rgb.point.y = positions(2, 1);
         rgb.point.z = 0;
 
-        msg->observations[0].features[counter] = rgb;
-        msg->observations[0].ext_camera_info = rgb_camera_manager_.getCameraInfo();
-        msg->observations[1].features[counter] = world;
+        msg->observations[idx_cam].features[counter] = rgb;
+        msg->observations[idx_cam].ext_camera_info = rgb_camera_manager_.getCameraInfo();
+        msg->observations[idx_chain].features[counter] = world;
         counter++;
 
         // bottom left
@@ -240,9 +256,9 @@ bool ChilitagFinder2D::findInternal(robot_calibration_msgs::CalibrationData * ms
         rgb.point.y = positions(3, 1);
         rgb.point.z = 0;
 
-        msg->observations[0].features[counter] = rgb;
-        msg->observations[0].ext_camera_info = rgb_camera_manager_.getCameraInfo();
-        msg->observations[1].features[counter] = world;
+        msg->observations[idx_cam].features[counter] = rgb;
+        msg->observations[idx_cam].ext_camera_info = rgb_camera_manager_.getCameraInfo();
+        msg->observations[idx_chain].features[counter] = world;
         counter++;
 
       // Do not accept NANs
@@ -271,8 +287,8 @@ bool ChilitagFinder2D::findInternal(robot_calibration_msgs::CalibrationData * ms
 }
 
 void ChilitagFinder2D::drawTags(cv::Mat& image, const chilitags::TagCornerMap map) {
-  int line_length = 5;
-  int line_width = 1;
+  int line_length = 8;
+  int line_width = 3;
 
   for (auto& kv : map) {
     chilitags::Quad q = kv.second;
