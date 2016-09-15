@@ -9,14 +9,38 @@ models:
    frame: gripper_cam_optical_frame
 free_params:
  - arm_joint_0
-#free_frames:
-# - name: base_chilitag_link
-#   x: false
-#   y: false
-#   z: false
-#   roll: false
-#   pitch: false
-#   yaw: falses
+ - arm_joint_1
+ - arm_joint_2
+ - arm_joint_3
+free_frames:
+ - name: chilitag1_link
+   x: true
+   y: true
+   z: true
+   roll: true
+   pitch: true
+   yaw: true
+ - name: chilitag2_link
+   x: true
+   y: true
+   z: true
+   roll: true
+   pitch: true
+   yaw: true
+ - name: chilitag3_link
+   x: true
+   y: true
+   z: true
+   roll: true
+   pitch: true
+   yaw: true
+ - name: gripper_cam_optical_frame
+   x: true
+   y: true
+   z: true
+   roll: true
+   pitch: true
+   yaw: true
 error_blocks:
  - name: hand_eye
    type: camera2d_to_arm

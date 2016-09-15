@@ -149,7 +149,7 @@ bool ChilitagFinder2D::findInternal(robot_calibration_msgs::CalibrationData * ms
   }
 
   // Find chilitags
-  chilitags::TagCornerMap map = detector_.find(cv_image->image);
+  chilitags::TagCornerMap map = detector_.find(cv_image->image, chilitags::Chilitags::DETECT_ONLY);
 
   bool found = (map.size() > 0);
 

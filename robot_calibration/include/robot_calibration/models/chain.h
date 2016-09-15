@@ -132,8 +132,11 @@ public:
    */
   KDL::Frame getChainFK(const CalibrationOffsetParser& offsets,
                         const sensor_msgs::JointState& state);
+  KDL::Frame getChainFK(const CalibrationOffsetParser& offsets,
+                        const sensor_msgs::JointState& state,
+                        const KDL::Chain chain);
 
-  KDL::Frame getPreFK(std::string frame_id, const sensor_msgs::JointState& state);
+  KDL::Frame getPreFK(std::string frame_id, const CalibrationOffsetParser& offsets, const sensor_msgs::JointState& state);
 
 private:
   KDL::Chain chain_;
