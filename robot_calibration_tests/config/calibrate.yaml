@@ -1,40 +1,33 @@
 verbose: true
-base_link: gripper_cam_optical_frame
+base_link: arm_gripper_cam_optical_frame
 models:
  - name: arm
    type: chain
-   frame: chilitag1_link
+   frame: base_link
  - name: camera
    type: camera2d
-   frame: gripper_cam_optical_frame
+   frame: arm_gripper_cam_optical_frame
 free_params:
  - arm_joint_0
  - arm_joint_1
  - arm_joint_2
  - arm_joint_3
 free_frames:
- - name: chilitag1_link
+ - name: chilitag0_joint
    x: true
    y: true
    z: true
    roll: true
    pitch: true
    yaw: true
-# - name: chilitag2_link
-#   x: true
-#   y: true
-#   z: true
-#   roll: true
-#   pitch: true
-#   yaw: true
-# - name: chilitag3_link
-#   x: true
-#   y: true
-#   z: true
-#   roll: true
-#   pitch: true
-#   yaw: true
- - name: gripper_cam_optical_frame
+ - name: chilitag1_joint
+   x: true
+   y: true
+   z: true
+   roll: true
+   pitch: true
+   yaw: true
+ - name: arm_gripper_cam_optical_joint
    x: true
    y: true
    z: true

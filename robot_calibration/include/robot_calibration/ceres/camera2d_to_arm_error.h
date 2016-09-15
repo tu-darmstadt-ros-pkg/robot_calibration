@@ -85,7 +85,8 @@ struct Camera2dToArmError
     for (size_t i = 0; i < camera_pts.size(); ++i)
     {
       if (camera_pts[i].header.frame_id != arm_pts[i].header.frame_id)
-        std::cerr << "Projected observation frame_id does not match projected estimate." << std::endl;
+        std::cerr << "Projected observation frame_id " << camera_pts[i].header.frame_id << "does not match projected estimate "
+                  << arm_pts[i].header.frame_id << "." << std::endl;
 
       // Project arm points to image plane
       geometry_msgs::Point img_point = projectPose(camera_model_->getCameraInfo(), arm_pts[i].point);
@@ -130,7 +131,10 @@ struct Camera2dToArmError
     ceres::DynamicNumericDiffCostFunction<Camera2dToArmError> * func;
     func = new ceres::DynamicNumericDiffCostFunction<Camera2dToArmError>(
                     new Camera2dToArmError(camera_model, arm_model, offsets, data));
+
+    ROS_INFO_STREAM("Creating parameter block with " << offsets->size() << " free parameters.");
     func->AddParameterBlock(offsets->size());
+    ROS_INFO_STREAM("Creating " << data.observations[index].features.size() * 2 << " residuals");
     func->SetNumResiduals(data.observations[index].features.size() * 2);
 
     return static_cast<ceres::CostFunction*>(func);

@@ -11,6 +11,7 @@ ChilitagFinder2D::ChilitagFinder2D(ros::NodeHandle & nh) :
   // Setup Scriber
   image_sub_ = nh.subscribe("image", 1, &ChilitagFinder2D::cameraCallback, this);
 
+  detector_.setFilter(0, 0);
   detector_.setPerformance(chilitags::Chilitags::ROBUST);
 
   // Load parameters

@@ -120,7 +120,11 @@ std::string CalibrationOffsetParser::getOffsetYAML()
   std::stringstream ss;
   for (size_t i = 0; i < parameter_names_.size(); ++i)
   {
-    ss << parameter_names_[i] << ": " << parameter_offsets_[i] << std::endl;
+    ss << parameter_names_[i] << ": " << parameter_offsets_[i];
+    if (parameter_offsets_[i] == 0.0) {
+      ss << " [WARN] Parameter never used, check for typos!";
+    }
+    ss << std::endl;
   }
   return ss.str();
 }
