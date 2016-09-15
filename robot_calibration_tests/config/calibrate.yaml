@@ -20,20 +20,20 @@ free_frames:
    roll: true
    pitch: true
    yaw: true
- - name: chilitag2_link
-   x: true
-   y: true
-   z: true
-   roll: true
-   pitch: true
-   yaw: true
- - name: chilitag3_link
-   x: true
-   y: true
-   z: true
-   roll: true
-   pitch: true
-   yaw: true
+# - name: chilitag2_link
+#   x: true
+#   y: true
+#   z: true
+#   roll: true
+#   pitch: true
+#   yaw: true
+# - name: chilitag3_link
+#   x: true
+#   y: true
+#   z: true
+#   roll: true
+#   pitch: true
+#   yaw: true
  - name: gripper_cam_optical_frame
    x: true
    y: true
