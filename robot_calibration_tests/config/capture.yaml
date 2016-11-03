@@ -1,12 +1,12 @@
 chains:
   - name: arm
-    topic: /arm_control/arm_traj_controller/follow_joint_trajectory/goal
+    topic: /arm_control/arm_traj_controller/follow_joint_trajectory
     joints:
      - arm_joint_0
      - arm_joint_1
      - arm_joint_2
      - arm_joint_3
-    planning_group: arm #arm_group
+    planning_group: arm_group
 duration: 2.0
 features:
   chilitag_finder:

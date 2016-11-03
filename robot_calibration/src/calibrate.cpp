@@ -137,9 +137,7 @@ int main(int argc, char** argv)
             robot_calibration_msgs::CaptureConfig config;
             config.joint_states = *js_msg;
             // Assume all finders should find this pose (old style config):
-            for (robot_calibration::FeatureFinderMap::iterator it = finders_.begin();
-                 it != finders_.end();
-                 it++)
+            for (robot_calibration::FeatureFinderMap::iterator it = finders_.begin(); it != finders_.end(); it++)
             {
               config.features.push_back(it->first);
             }
@@ -193,41 +191,41 @@ int main(int argc, char** argv)
       ros::Duration(0.1).sleep();
 
       // Get pose of the features
+//      bool found_all_features = true;
+//      if (poses.size() == 0)
+//      {
       bool found_all_features = true;
-      if (poses.size() == 0)
+      ROS_INFO_STREAM("Looking for features now..");
+      // In manual mode, we need to capture all features
+      for (robot_calibration::FeatureFinderMap::iterator it = finders_.begin(); it != finders_.end(); it++)
       {
-        ROS_INFO_STREAM("Looking for features now..");
-        // In manual mode, we need to capture all features
-        for (robot_calibration::FeatureFinderMap::iterator it = finders_.begin();
-             it != finders_.end();
-             it++)
+        if (!it->second->find(&msg))
         {
-          if (!it->second->find(&msg))
-          {
-            ROS_WARN("%s failed to capture features.", it->first.c_str());
-            found_all_features = false;
-            break;
-          }
+          ROS_WARN("%s failed to capture features.", it->first.c_str());
+          found_all_features = false;
+          break;
         }
       }
-      else
-      {
-        // Capture only the intended features for this sample
-        // NOTE: while you can capture multiple sensors at once for a single
-        //       pose, such things probably won't currently calibrate. Most
-        //       of the existing finders will override the entire observation
-        //       vector
-        for (size_t i = 0; i < poses[pose_idx].features.size(); i++)
-        {
-          std::string feature = poses[pose_idx].features[i];
-          if (!finders_[feature]->find(&msg))
-          {
-            ROS_WARN("%s failed to capture features.", feature.c_str());
-            found_all_features = false;
-            break;
-          }
-        }
-      }
+//      }
+//      else
+//      {
+//        // Capture only the intended features for this sample
+//        // NOTE: while you can capture multiple sensors at once for a single
+//        //       pose, such things probably won't currently calibrate. Most
+//        //       of the existing finders will override the entire observation
+//        //       vector
+//        ROS_INFO_STREAM("Pose feature size: " << poses[pose_idx].features.size());
+//        for (size_t i = 0; i < poses[pose_idx].features.size(); i++)
+//        {
+//          std::string feature = poses[pose_idx].features[i];
+//          if (!finders_[feature]->find(&msg))
+//          {
+//            ROS_WARN("%s failed to capture features.", feature.c_str());
+//            found_all_features = false;
+//            break;
+//          }
+//        }
+//      }
 
       // Make sure we succeeded
       if (found_all_features)
