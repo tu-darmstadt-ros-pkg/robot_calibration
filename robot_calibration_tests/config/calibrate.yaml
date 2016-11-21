@@ -1,17 +1,18 @@
 verbose: true
-base_link: arm_gripper_cam_optical_frame
+base_link: arm_zoom_cam_optical_frame
 models:
  - name: arm
    type: chain
    frame: base_link
  - name: camera
    type: camera2d
-   frame: arm_gripper_cam_optical_frame
+   frame: arm_zoom_cam_optical_frame
 free_params:
  - arm_joint_0
  - arm_joint_1
  - arm_joint_2
- - arm_joint_3
+ - sensor_head_pitch_joint
+ - sensor_head_yaw_joint
 free_frames:
  - name: chilitag0_joint
    x: true
@@ -27,7 +28,7 @@ free_frames:
    roll: true
    pitch: true
    yaw: true
- - name: arm_gripper_cam_optical_joint
+ - name: arm_zoom_cam_optical_frame
    x: true
    y: true
    z: true

@@ -5,7 +5,12 @@ chains:
      - arm_joint_0
      - arm_joint_1
      - arm_joint_2
-     - arm_joint_3
+    planning_group: arm_group
+  - name: head
+    topic: /sensor_head_control/sensor_head_traj_controller/follow_joint_trajectory
+    joints:
+     - sensor_head_pitch_joint
+     - sensor_head_yaw_joint
     planning_group: arm_group
 duration: 2.0
 features:
