@@ -50,7 +50,7 @@ ChainManager::ChainManager(ros::NodeHandle& nh, double wait_time)
       controller->joint_names.push_back(static_cast<std::string>(chains[i]["joints"][j]));
     }
 
-    ROS_INFO("Waiting for %s...", topic.c_str());
+    ROS_INFO("Waiting %f seconds for %s...", wait_time, topic.c_str());
     if (!controller->client.waitForServer(ros::Duration(wait_time)))
     {
       ROS_WARN("Failed to connect to %s", topic.c_str());
