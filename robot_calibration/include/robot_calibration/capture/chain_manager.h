@@ -41,29 +41,6 @@ class ChainManager
   typedef boost::shared_ptr<MoveGroupClient> MoveGroupClientPtr;
   typedef boost::shared_ptr<const moveit_msgs::MoveGroupResult> MoveGroupResultPtr;
 
-  // This controls a single chain
-  struct ChainController
-  {
-    ChainController(const std::string& name,
-                    const std::string& topic,
-                    const std::string& planning_group) :
-      client(topic, true),
-      chain_name(name),
-      chain_planning_group(planning_group)
-    {
-    }
-
-    bool shouldPlan()
-    {
-      return (chain_planning_group != "");
-    }
-
-    TrajectoryClient client;
-    std::string chain_name;
-    std::string chain_planning_group;
-    std::vector<std::string> joint_names;
-  };
-
 public:
   /**
    * @brief Constructor, sets up chains from ros parameters.
@@ -89,31 +66,17 @@ public:
    */
   bool getState(sensor_msgs::JointState* state);
 
-  /**
-   * @brief Get the names of chains. Mainly for testing
-   */
-  std::vector<std::string> getChains();
-
-  /**
-   * @brief Get the joint names associated with a chain. Mainly for testing
-   */
-  std::vector<std::string> getChainJointNames(const std::string& chain_name);
-
-  // Mainly for testing
-  std::string getPlanningGroupName(const std::string& chain_name);
+  double getPosition(const sensor_msgs::JointState &state, std::string joint_name);
 
 private:
   void stateCallback(const sensor_msgs::JointStateConstPtr& msg);
 
-  trajectory_msgs::JointTrajectoryPoint makePoint(const sensor_msgs::JointState& state,
-                                                  const std::vector<std::string>& joints);
-
   ros::Subscriber subscriber_;
   sensor_msgs::JointState state_;
-  double duration_;
   boost::mutex state_mutex_;
-  std::vector<boost::shared_ptr<ChainController> > controllers_;
   MoveGroupClientPtr move_group_;
+  std::string planning_group;
+  std::vector<std::string> joint_names;
   double velocity_factor_;  // scaling factor to slow down move_group plans
 };
 

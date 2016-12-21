@@ -24,52 +24,14 @@ namespace robot_calibration
 
 ChainManager::ChainManager(ros::NodeHandle& nh, double wait_time)
 {
-  // We cannot do much without some kinematic chains
-  if (!nh.hasParam("chains"))
+  nh.param<std::string>("moveit/planning_group", planning_group, "arm_group");
+  nh.param<std::vector<std::string>>("moveit/joints", joint_names, std::vector<std::string>());
+
+  move_group_.reset(new MoveGroupClient("move_group", true));
+  if (!move_group_->waitForServer(ros::Duration(wait_time)))
   {
-    // TODO raise error
+    ROS_WARN("Failed to connect to move_group");
   }
-
-  // Get chains
-  XmlRpc::XmlRpcValue chains;
-  nh.getParam("chains", chains);
-  ROS_ASSERT(chains.getType() == XmlRpc::XmlRpcValue::TypeArray);
-
-  // Construct each chain to manage
-  for (int i = 0; i < chains.size(); ++i)
-  {
-    std::string name, topic, group;
-    name = static_cast<std::string>(chains[i]["name"]);
-    topic = static_cast<std::string>(chains[i]["topic"]);
-    group = static_cast<std::string>(chains[i]["planning_group"]);
-
-    boost::shared_ptr<ChainController> controller(new ChainController(name, topic, group));
-
-    for (int j = 0; j < chains[i]["joints"].size(); ++j)
-    {
-      controller->joint_names.push_back(static_cast<std::string>(chains[i]["joints"][j]));
-    }
-
-    ROS_INFO("Waiting %f seconds for %s...", wait_time, topic.c_str());
-    if (!controller->client.waitForServer(ros::Duration(wait_time)))
-    {
-      ROS_WARN("Failed to connect to %s", topic.c_str());
-    }
-
-    if (controller->shouldPlan() && (!move_group_))
-    {
-      move_group_.reset(new MoveGroupClient("move_group", true));
-      if (!move_group_->waitForServer(ros::Duration(wait_time)))
-      {
-        ROS_WARN("Failed to connect to move_group");
-      }
-    }
-
-    controllers_.push_back(controller);
-  }
-
-  // Parameter to set movement time
-  nh.param<double>("duration", duration_, 5.0);
 
   // Parameter to set velocity scaling factor for move_group
   nh.param<double>("velocity_factor", velocity_factor_, 1.0);
@@ -122,103 +84,55 @@ bool ChainManager::getState(sensor_msgs::JointState* state)
   return true;  // TODO: this should actually return whether state is valid
 }
 
-trajectory_msgs::JointTrajectoryPoint
-ChainManager::makePoint(const sensor_msgs::JointState& state, const std::vector<std::string>& joints)
-{
-  trajectory_msgs::JointTrajectoryPoint p;
-  for (size_t i = 0; i < joints.size(); ++i)
-  {
-    for (size_t j = 0; j < state.name.size(); ++j)
-    {
-      if (joints[i] == state.name[j])
-      {
-        p.positions.push_back(state.position[j]);
-        break;
-      }
-    }
-    p.velocities.push_back(0.0);
-    p.accelerations.push_back(0.0);
-    if (p.velocities.size() != p.positions.size())
-    {
-      ROS_ERROR_STREAM("Bad move to state, missing " << joints[i]);
-      exit(-1);
+double ChainManager::getPosition(const sensor_msgs::JointState& state, std::string joint_name) {
+  for (unsigned int i = 0; i < state.name.size(); i++) {
+    if (state.name[i] == joint_name) {
+      return state.position[i];
     }
   }
-  return p;
+  // joint not found
+  ROS_WARN_STREAM("Moveit joint " << joint_name << " not found in commanded joint state. Check your bag file.");
+  return 0.0;
 }
+
 
 bool ChainManager::moveToState(const sensor_msgs::JointState& state)
 {
-  double max_duration = duration_;
+  // Call MoveIt
+  moveit_msgs::MoveGroupGoal moveit_goal;
+  moveit_goal.request.group_name = planning_group;
+  moveit_goal.request.num_planning_attempts = 1;
+  moveit_goal.request.allowed_planning_time = 5.0;
 
-  // Split into different controllers
-  for(size_t i = 0; i < controllers_.size(); ++i)
+  moveit_msgs::Constraints c1;
+  c1.joint_constraints.resize(joint_names.size());
+  for (size_t c = 0; c < joint_names.size(); c++)
   {
-    control_msgs::FollowJointTrajectoryGoal goal;
-    goal.trajectory.joint_names = controllers_[i]->joint_names;
-
-    trajectory_msgs::JointTrajectoryPoint p = makePoint(state, controllers_[i]->joint_names);
-    if (controllers_[i]->shouldPlan())
-    {
-      // Call MoveIt
-      moveit_msgs::MoveGroupGoal moveit_goal;
-      moveit_goal.request.group_name = controllers_[i]->chain_planning_group;
-      moveit_goal.request.num_planning_attempts = 1;
-      moveit_goal.request.allowed_planning_time = 5.0;
-
-      moveit_msgs::Constraints c1;
-      c1.joint_constraints.resize(controllers_[i]->joint_names.size());
-      for (size_t c = 0; c < controllers_[i]->joint_names.size(); c++)
-      {
-        c1.joint_constraints[c].joint_name = controllers_[i]->joint_names[c];
-        c1.joint_constraints[c].position = p.positions[c];
-        c1.joint_constraints[c].tolerance_above = 0.01;
-        c1.joint_constraints[c].tolerance_below = 0.01;
-        c1.joint_constraints[c].weight = 1.0;
-      }
-      moveit_goal.request.goal_constraints.push_back(c1);
-
-      // Reduce speed
-      moveit_goal.request.max_velocity_scaling_factor = velocity_factor_;
-
-      // All diffs
-      moveit_goal.request.start_state.is_diff = true;
-      moveit_goal.planning_options.planning_scene_diff.is_diff = true;
-      moveit_goal.planning_options.planning_scene_diff.robot_state.is_diff = true;
-
-      // Just make the plan, we will execute it
-      moveit_goal.planning_options.plan_only = true;
-
-      move_group_->sendGoal(moveit_goal);
-      move_group_->waitForResult();
-      MoveGroupResultPtr result = move_group_->getResult();
-      if (result->error_code.val != moveit_msgs::MoveItErrorCodes::SUCCESS)
-      {
-        // Unable to plan, return error
-        return false;
-      }
-
-      goal.trajectory = result->planned_trajectory.joint_trajectory;
-      max_duration = std::max(max_duration, goal.trajectory.points[goal.trajectory.points.size()-1].time_from_start.toSec());
-    }
-    else
-    {
-      // Go directly to point
-      p.time_from_start = ros::Duration(duration_);
-      goal.trajectory.points.push_back(p);
-    }
-
-    goal.goal_time_tolerance = ros::Duration(1.0);
-
-    // Call actions
-    controllers_[i]->client.sendGoal(goal);
+    c1.joint_constraints[c].joint_name = joint_names[c];
+    c1.joint_constraints[c].position = getPosition(state, joint_names[c]);
+    c1.joint_constraints[c].tolerance_above = 0.01;
+    c1.joint_constraints[c].tolerance_below = 0.01;
+    c1.joint_constraints[c].weight = 1.0;
   }
+  moveit_goal.request.goal_constraints.push_back(c1);
 
-  // Wait for results
-  for (size_t i = 0; i < controllers_.size(); ++i)
+  // Reduce speed
+  moveit_goal.request.max_velocity_scaling_factor = velocity_factor_;
+
+  // All diffs
+  moveit_goal.request.start_state.is_diff = true;
+  moveit_goal.planning_options.planning_scene_diff.is_diff = true;
+  moveit_goal.planning_options.planning_scene_diff.robot_state.is_diff = true;
+
+  moveit_goal.planning_options.plan_only = false;
+
+  move_group_->sendGoal(moveit_goal);
+  move_group_->waitForResult();
+  MoveGroupResultPtr result = move_group_->getResult();
+  if (result->error_code.val != moveit_msgs::MoveItErrorCodes::SUCCESS)
   {
-    controllers_[i]->client.waitForResult(ros::Duration(max_duration*1.5));
-    // TODO: catch errors with clients
+    ROS_ERROR_STREAM("Moveit planning failed with error code: " << result->error_code.val);
+    return false;
   }
 
   return true;
@@ -226,6 +140,7 @@ bool ChainManager::moveToState(const sensor_msgs::JointState& state)
 
 bool ChainManager::waitToSettle()
 {
+  //TODO: Rewrite this
   sensor_msgs::JointState state;
 
   // TODO: timeout?
@@ -241,15 +156,12 @@ bool ChainManager::waitToSettle()
       if (fabs(state.velocity[j]) < 1)
         continue;
 
-      for (size_t i = 0; i < controllers_.size(); ++i)
+      for (size_t k = 0; k < joint_names.size(); ++k)
       {
-        for (size_t k = 0; k < controllers_[i]->joint_names.size(); ++k)
+        if (joint_names[k] == state.name[j])
         {
-          if (controllers_[i]->joint_names[k] == state.name[j])
-          {
-            settled = false;
-            break;
-          }
+          settled = false;
+          break;
         }
       }
 
@@ -266,40 +178,6 @@ bool ChainManager::waitToSettle()
   }
 
   return true;
-}
-
-std::vector<std::string> ChainManager::getChains()
-{
-  std::vector<std::string> chains;
-  for (size_t i = 0; i < controllers_.size(); ++i)
-  {
-    chains.push_back(controllers_[i]->chain_name);
-  }
-  return chains;
-}
-
-std::vector<std::string> ChainManager::getChainJointNames(
-  const std::string& chain_name)
-{
-  for (size_t i = 0; i < controllers_.size(); ++i)
-  {
-    if (controllers_[i]->chain_name == chain_name)
-      return controllers_[i]->joint_names;
-  }
-  std::vector<std::string> empty;
-  return empty;
-}
-
-std::string ChainManager::getPlanningGroupName(
-  const std::string& chain_name)
-{
-  for (size_t i = 0; i < controllers_.size(); ++i)
-  {
-    if (controllers_[i]->chain_name == chain_name)
-      return controllers_[i]->chain_planning_group;
-  }
-  std::vector<std::string> empty;
-  return std::string("");
 }
 
 }  // namespace robot_calibration
