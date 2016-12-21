@@ -11,7 +11,7 @@ from robot_calibration_msgs.msg import CaptureConfig
 
 bag_name = 'calibration_poses.bag'
 action_topic = '/combined_planner'
-frame_ids = ['chilitag{}_link'.format(i) for i in range(2)]
+frame_ids = ['chilitag{}_link'.format(i) for i in [4, 5, 7]]
 poses_per_frame = 10
 
 client_timeout = 5
@@ -54,8 +54,8 @@ class CapturePoses:
 
 def create_action_goal():
     goal = argo_move_group_msgs.msg.ArgoCombinedPlanGoal()
-    goal.object_type.val = 4
-    goal.action_type.val = 2
+    goal.object_type.data = "chilitag"
+    goal.action_type.val = argo_move_group_msgs.msg.ActionCodes.SAMPLE_MOVE_ARM
     goal.target.header.frame_id = frame
     goal.target.pose.position.z = 0.001
     return goal
