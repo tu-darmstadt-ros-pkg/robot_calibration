@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <launch>
-  <node pkg="robot_calibration" type="calibrate" name="robot_calibration" args="$(find robot_calibration_tests)/config/calibration_poses.bag" output="screen" launch-prefix="">
+  <node pkg="robot_calibration" type="calibrate" name="robot_calibration" args="$(find robot_calibration_tests)/config/calibration_poses_new.bag" output="screen" launch-prefix="">
     <param name="velocity_factor" value="1" />
     <rosparam file="$(find robot_calibration_tests)/config/capture.yaml" command="load" />
     <rosparam file="$(find robot_calibration_tests)/config/calibrate.yaml" command="load" />
