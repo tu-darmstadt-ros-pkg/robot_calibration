@@ -14,14 +14,21 @@ free_params:
  - sensor_head_pitch_joint
  - sensor_head_yaw_joint
 free_frames:
- - name: chilitag0_joint
+ - name: chilitag4_joint
    x: true
    y: true
    z: true
    roll: true
    pitch: true
    yaw: true
- - name: chilitag1_joint
+ - name: chilitag5_joint
+   x: true
+   y: true
+   z: true
+   roll: true
+   pitch: true
+   yaw: true
+ - name: chilitag7_joint
    x: true
    y: true
    z: true
