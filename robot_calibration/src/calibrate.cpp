@@ -186,7 +186,7 @@ int main(int argc, char** argv)
       chain_manager_.waitToSettle();
 
       // Make sure sensor data is up to date after settling
-      ros::Duration(0.1).sleep();
+      ros::Duration(2.0).sleep();
 
       // Get pose of the features
 //      bool found_all_features = true;
