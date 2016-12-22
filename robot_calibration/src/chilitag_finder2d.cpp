@@ -15,7 +15,7 @@ ChilitagFinder2D::ChilitagFinder2D(ros::NodeHandle & nh) :
   detector_.setPerformance(chilitags::Chilitags::ROBUST);
 
   // Load parameters
-  nh.param<int>("size", marker_size_, 0.03);
+  nh.param<double>("size", marker_size_, 0.03);
   nh.param<std::vector<int>>("tag_ids", tag_ids_, std::vector<int>());
   if (tag_ids_.size() == 0) {
     ROS_WARN_STREAM("No tag ids set for detection. Detecting all tags (not recommendet).");
