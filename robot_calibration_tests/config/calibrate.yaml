@@ -35,7 +35,7 @@ free_frames:
    roll: true
    pitch: true
    yaw: true
- - name: arm_zoom_cam_optical_frame
+ - name: arm_zoom_cam_optical_joint
    x: true
    y: true
    z: true
