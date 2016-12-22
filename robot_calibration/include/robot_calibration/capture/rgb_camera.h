@@ -44,13 +44,14 @@ public:
     camera_info_subscriber_ = nh.subscribe("/head_camera/rgb/camera_info", 1, &RGBCameraInfoManager::cameraInfoCallback, this);
 
     // Wait for camera_info
-    int count = 25;
+    int count = 100;
     while (--count)
     {
       if (camera_info_valid_)
       {
         return true;
       }
+      ROS_INFO("Waiting for CameraInfo.");
       ros::Duration(0.1).sleep();
       ros::spinOnce();
     }
