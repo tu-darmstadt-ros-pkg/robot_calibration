@@ -155,6 +155,10 @@ int main(int argc, char** argv)
       ROS_INFO("Using manual calibration mode...");
     }
 
+    /*
+     * Capturing data
+     */
+
     // For each pose in the capture sequence.
     for (unsigned pose_idx = 0; (pose_idx < poses.size() || poses.size() == 0) && ros::ok(); ++pose_idx)
     {
@@ -174,6 +178,7 @@ int main(int argc, char** argv)
       else
       {
         // Move head/arm to pose
+        ROS_INFO_STREAM("Moving to pose " << pose_idx << ".");
         if (!chain_manager_.moveToState(poses[pose_idx].joint_states))
         {
           ROS_WARN("Unable to move to desired state for sample %u.", pose_idx);
@@ -182,11 +187,13 @@ int main(int argc, char** argv)
       }
 
       // Regardless of manual vs. automatic, wait for joints to settle
-      ROS_INFO_STREAM("Waiting for joints to settle.");
-      chain_manager_.waitToSettle();
+      //ROS_INFO_STREAM("Waiting for joints to settle.");
+      //chain_manager_.waitToSettle();
 
       // Make sure sensor data is up to date after settling
-      ros::Duration(2.0).sleep();
+      double settle_wait_time; // time to wait after moving to pose in seconds
+      nh.param("settle_wait_time", settle_wait_time, 1.0);
+      ros::Duration(settle_wait_time).sleep();
 
       // Get pose of the features
 //      bool found_all_features = true;
@@ -285,6 +292,10 @@ int main(int argc, char** argv)
       data.push_back(*msg);
     }
   }
+
+  /*
+   * Optimization
+   */
 
   // Create instance of optimizer
   robot_calibration::OptimizationParams params;

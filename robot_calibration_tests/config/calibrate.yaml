@@ -14,28 +14,14 @@ free_params:
  - sensor_head_pitch_joint
  - sensor_head_yaw_joint
 free_frames:
- - name: chilitag4_joint
-   x: true
-   y: true
-   z: true
-   roll: true
-   pitch: true
-   yaw: true
- - name: chilitag5_joint
-   x: true
-   y: true
-   z: true
-   roll: true
-   pitch: true
-   yaw: true
- - name: chilitag7_joint
-   x: true
-   y: true
-   z: true
-   roll: true
-   pitch: true
-   yaw: true
  - name: arm_zoom_cam_optical_joint
+   x: true
+   y: true
+   z: true
+   roll: true
+   pitch: true
+   yaw: true
+ - name: chilitag_base_joint
    x: true
    y: true
    z: true
@@ -47,9 +33,9 @@ error_blocks:
    type: camera2d_to_arm
    camera: camera
    arm: arm
-# - name: restrict_camera
-#   type: outrageous
-#   param: head_camera_rgb_joint
-#   joint_scale: 0.0
-#   position_scale: 0.1
-#   rotation_scale: 0.1
+ - name: restrict_camera
+   type: outrageous
+   param: arm_zoom_cam_optical_joint
+   joint_scale: 0.0
+   position_scale: 0.1
+   rotation_scale: 0.1
