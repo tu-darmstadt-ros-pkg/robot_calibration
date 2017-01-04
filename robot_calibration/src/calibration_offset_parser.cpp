@@ -16,6 +16,9 @@
 
 // Author: Michael Ferguson
 
+#include <ros/ros.h>
+#include <fstream>
+
 #include <string>
 #include <map>
 #include <tinyxml.h>
@@ -129,6 +132,139 @@ std::string CalibrationOffsetParser::getOffsetYAML()
   return ss.str();
 }
 
+std::vector<std::string> split(const std::string &s, char delim) {
+  std::vector<std::string> elems;
+  std::stringstream ss;
+  ss.str(s);
+  std::string item;
+  while (std::getline(ss, item, delim)) {
+    if (item != "")
+      elems.push_back(item);
+  }
+  return elems;
+}
+
+std::vector<double> splitCast(const std::string &s, char delim) {
+  std::vector<double> elems;
+  std::stringstream ss;
+  ss.str(s);
+  std::string item;
+  while (std::getline(ss, item, delim)) {
+    if (item != "") {
+      try {
+        double d_item = boost::lexical_cast<double>(item);
+        elems.push_back(d_item);
+      } catch (boost::bad_lexical_cast) {
+        ROS_ERROR_STREAM(item << " is not a valid double.");
+      }
+    }
+  }
+  return elems;
+}
+
+std::vector<double> getVector3(TiXmlElement* xml, std::string child_name, std::string attribute_name) {
+  TiXmlElement *elem_xml = xml->FirstChildElement(child_name);
+  if (!elem_xml) {
+    ROS_ERROR("Joint has no axis element");
+    return std::vector<double>();
+  }
+  const std::string * attrib_str = elem_xml->Attribute(attribute_name);
+  if (attrib_str == NULL) {
+    ROS_ERROR_STREAM(attribute_name << "attribute of " << child_name << " element is null.");
+    return std::vector<double>();
+  }
+  return splitCast(*attrib_str, ' ');
+}
+
+std::string CalibrationOffsetParser::getXacro(const std::string& urdf) {
+  TiXmlDocument xml_doc;
+  xml_doc.Parse(urdf.c_str());
+
+  TiXmlElement *robot_xml = xml_doc.FirstChildElement("robot");
+  if (!robot_xml)
+  {
+    // We should never get here since URDF parse at beginning of calibration will fail
+    ROS_ERROR("Couldn't find robot element in robot_description");
+    return "";
+  }
+
+  std::stringstream file;
+  // insert header
+  file << "<?xml version=\"1.0\"?>" << std::endl;
+  file << "<robot name=\"calibration\" xmlns:xacro=\"http://playerstage.sourceforge.net/gazebo/xmlschema/#interface\">" << std::endl;
+
+  /*
+   * Joint offsets
+   */
+
+  // Create entry for each joint
+  for (TiXmlElement* joint_xml = robot_xml->FirstChildElement("joint"); joint_xml; joint_xml = joint_xml->NextSiblingElement("joint"))
+  {
+    const char * name = joint_xml->Attribute("name");
+
+    // Is there a joint calibration needed?
+    double offset = get(std::string(name));
+    if (offset != 0.0)
+    {
+      // get rotation axis and sign
+      std::vector<double> axes = getVector3(joint_xml, "axis", "xyz");
+      int axis_idx = 0;
+      while (axes[axis_idx] == 0.0) {
+        axis_idx++;
+      }
+      if (axis_idx == 3) {
+        ROS_ERROR("No rotation axis specified.");
+        return "";
+      }
+      double sign = axes[axis_idx];
+      // add offset * sign to current offset
+      std::vector<double> rpy = getVector3(joint_xml, "origin", "rpy");
+      double current_pos = rpy[axis_idx];
+      double new_offset = current_pos + sign * offset;
+      // create entry
+      file << "  <xacro:property name=\"" << name << "_offset\" value=\"" << new_offset << "\"/>" << std::endl << std::endl;
+    }
+
+    /*
+     * Frame offsets
+     */
+
+    KDL::Frame frame_offset;
+    bool has_update = getFrame(name, frame_offset);
+    if (has_update) {
+      std::vector<double> xyz_offset(3, 0.0);
+      std::vector<double> rpy_offset(3, 0.0);
+
+      xyz_offset[0] = frame_offset.p.x();
+      xyz_offset[1] = frame_offset.p.y();
+      xyz_offset[2] = frame_offset.p.z();
+
+      // Get roll, pitch, yaw about fixed axis
+      frame_offset.M.GetRPY(rpy_offset[0], rpy_offset[1], rpy_offset[2]);
+
+      std::vector<double> xyz_curr = getVector3(joint_xml, "origin", "xyz");
+      std::vector<double> rpy_curr = getVector3(joint_xml, "origin", "rpy");
+
+      std::vector<double> xyz_new(3, 0.0);
+      std::vector<double> rpy_new(3, 0.0);
+      for (unsigned int i = 0; i < 3; i++) {
+        xyz_new[i] = xyz_curr[i] + xyz_offset[i];
+        rpy_new[i] = rpy_curr[i] + rpy_offset[i];
+      }
+
+      // Write into xacro
+      file << "  <xacro:macro name=\"" << name << "_calibration\">" << std::endl;
+      file << "    <origin xyz=\"" << xyz_new[0] << " " << xyz_new[1] << " " << xyz_new[2] << "\" rpy=\"" << rpy_new[0] << " " << rpy_new[1] << " " << rpy_new[2] << "\"/>" << std::endl;
+      file << "  </xacro:macro>" << std::endl << std::endl;
+    }
+  }
+
+
+  // close file
+  file << "</robot>" << std::endl;
+  return file.str();
+}
+
 std::string CalibrationOffsetParser::updateURDF(const std::string &urdf)
 {
   const double precision = 8;
@@ -143,6 +279,10 @@ std::string CalibrationOffsetParser::updateURDF(const std::string &urdf)
     //       at beginning of calibration will fail
     return urdf;
   }
+
+  /*
+   * Joint offsets
+   */
 
   // Update each joint
   for (TiXmlElement* joint_xml = robot_xml->FirstChildElement("joint"); joint_xml; joint_xml = joint_xml->NextSiblingElement("joint"))
@@ -184,6 +324,10 @@ std::string CalibrationOffsetParser::updateURDF(const std::string &urdf)
         joint_xml->InsertEndChild(*calibration);
       }
     }
+
+    /*
+     * Frame offsets
+     */
 
     KDL::Frame frame_offset;
     bool has_update = getFrame(name, frame_offset);

@@ -73,6 +73,8 @@ public:
   /** \brief Update the urdf with the new offsets */
   std::string updateURDF(const std::string& urdf);
 
+  std::string getXacro(const std::string& urdf);
+
 private:
   // Names of parameters being calibrated. The order of this vector
   // is the same as the free_param order will be interpreted.

@@ -275,7 +275,7 @@ int main(int argc, char** argv)
     }
 
     // Get robot_description from bag file
-    rosbag::View model_view_(bag_, rosbag::TopicQuery("robot_description"));
+    rosbag::View model_view_(bag_, rosbag::TopicQuery("/robot_description"));
     if (model_view_.size() < 1)
     {
       std::cerr << "robot_description topic not found in bag file." << std::endl;
@@ -285,7 +285,7 @@ int main(int argc, char** argv)
     description_msg = *description_;
 
     // Parse calibration_data topic
-    rosbag::View data_view_(bag_, rosbag::TopicQuery("calibration_data"));
+    rosbag::View data_view_(bag_, rosbag::TopicQuery("/calibration_data"));
     BOOST_FOREACH (rosbag::MessageInstance const m, data_view_)
     {
       robot_calibration_msgs::CalibrationData::ConstPtr msg = m.instantiate<robot_calibration_msgs::CalibrationData>();
@@ -316,6 +316,20 @@ int main(int argc, char** argv)
   {
     std::time_t t = std::time(NULL);
     std::strftime(datecode, 80, "%Y_%m_%d_%H_%M_%S", std::localtime(&t));
+  }
+
+  // Save calibration to xacro
+  {
+    std::string xacro_save_path;
+    nh.param<std::string>("xacro_save_path", xacro_save_path, "");
+    if (xacro_save_path != "") {
+      ROS_INFO_STREAM("Saving calibration to xacro in: " << xacro_save_path);
+      std::string xacro_string = opt.getOffsets()->getXacro(description_msg.data);
+      std::ofstream file;
+      file.open(xacro_save_path);
+      file << xacro_string;
+      file.close();
+    }
   }
 
   // Save updated URDF
