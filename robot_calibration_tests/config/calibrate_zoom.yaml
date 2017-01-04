@@ -1,12 +1,12 @@
 verbose: true
-base_link: arm_rgbd_cam_rgb_optical_frame
+base_link: arm_zoom_cam_optical_frame
 models:
  - name: arm
    type: chain
    frame: base_link
  - name: camera
    type: camera2d
-   frame: arm_rgbd_cam_rgb_optical_frame
+   frame: arm_zoom_cam_optical_frame
 free_params:
  - arm_joint_0
  - arm_joint_1
@@ -14,7 +14,7 @@ free_params:
  - sensor_head_pitch_joint
  - sensor_head_yaw_joint
 free_frames:
- - name: arm_rgbd_cam_rgb_joint
+ - name: arm_zoom_cam_optical_joint # probably take arm_zoom_cam_joint instead
    x: true
    y: true
    z: true
@@ -35,7 +35,7 @@ error_blocks:
    arm: arm
  - name: restrict_camera
    type: outrageous
-   param: arm_rgbd_cam_rgb_joint
+   param: arm_zoom_cam_optical_joint
    joint_scale: 0.0
    position_scale: 0.1
    rotation_scale: 0.1

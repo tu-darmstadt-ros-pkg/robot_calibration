@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<launch>
+  <node pkg="robot_calibration" type="calibrate" name="robot_calibration" args="--from-bag $(find robot_calibration_tests)/config/calibration_data.bag" output="screen" launch-prefix="">
+    <param name="velocity_factor" value="1" />
+    <param name="settle_wait_time" value="0.1" />
+    <param name="xacro_save_path" value="$(find argo_tracker_description)/calibrations/arm_calibration.urdf.xacro"/>
+    <rosparam file="$(find robot_calibration_tests)/config/capture.yaml" command="load" />
+    <rosparam file="$(find robot_calibration_tests)/config/calibrate_zoom.yaml" command="load" />
+    
+    <remap from="~/features/chilitag_finder/image" to="/arm_zoom_cam/image_raw"/>
+    <remap from="/head_camera/rgb/camera_info" to="/arm_zoom_cam/camera_info" />
+  </node>
+</launch>
