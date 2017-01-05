@@ -77,6 +77,9 @@ int main(int argc, char** argv)
   bool verbose;
   nh.param<bool>("verbose", verbose, false);
 
+  double settle_wait_time; // time to wait after moving to pose in seconds
+  nh.param("settle_wait_time", settle_wait_time, 1.0);
+
   // The calibration data
   std_msgs::String description_msg;
   std::vector<robot_calibration_msgs::CalibrationData> data;
@@ -182,6 +185,7 @@ int main(int argc, char** argv)
         if (!chain_manager_.moveToState(poses[pose_idx].joint_states))
         {
           ROS_WARN("Unable to move to desired state for sample %u.", pose_idx);
+          ros::Duration(settle_wait_time).sleep();
           continue;
         }
       }
@@ -191,8 +195,6 @@ int main(int argc, char** argv)
       //chain_manager_.waitToSettle();
 
       // Make sure sensor data is up to date after settling
-      double settle_wait_time; // time to wait after moving to pose in seconds
-      nh.param("settle_wait_time", settle_wait_time, 1.0);
       ros::Duration(settle_wait_time).sleep();
 
       // Get pose of the features
