@@ -127,7 +127,11 @@ bool ChainManager::moveToState(const sensor_msgs::JointState& state)
   moveit_goal.planning_options.plan_only = false;
 
   move_group_->sendGoal(moveit_goal);
-  move_group_->waitForResult();
+  if (!move_group_->waitForResult(ros::Duration(20))) {
+    ROS_ERROR_STREAM("WaitForResult timed out. Aborting.");
+    return false;
+  }
+
   MoveGroupResultPtr result = move_group_->getResult();
   if (result->error_code.val != moveit_msgs::MoveItErrorCodes::SUCCESS)
   {
