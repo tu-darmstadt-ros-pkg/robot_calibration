@@ -92,14 +92,6 @@ int main(int argc, char** argv)
   if (pose_bag_name.compare("--from-bag") != 0)
   {
     // No name provided for a calibration bag file, must do capture
-    robot_calibration::ChainManager chain_manager_(nh);
-    robot_calibration::FeatureFinderMap finders_;
-    if (!robot_calibration::loadFeatureFinders(nh, finders_))
-    {
-      ROS_FATAL("Unable to load feature finders!");
-      return -1;
-    }
-
     ros::Publisher pub = nh.advertise<robot_calibration_msgs::CalibrationData>("/calibration_data", 10);
     ros::Publisher urdf_pub = nh.advertise<std_msgs::String>("/robot_description", 1, true);  // latched
 
@@ -110,6 +102,14 @@ int main(int argc, char** argv)
       return -1;
     }
     urdf_pub.publish(description_msg);
+
+    robot_calibration::ChainManager chain_manager_(nh);
+    robot_calibration::FeatureFinderMap finders_;
+    if (!robot_calibration::loadFeatureFinders(nh, finders_))
+    {
+      ROS_FATAL("Unable to load feature finders!");
+      return -1;
+    }
 
     // Load a set of calibration poses
     std::vector<robot_calibration_msgs::CaptureConfig> poses;

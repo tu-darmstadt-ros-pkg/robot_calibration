@@ -66,6 +66,17 @@ bool hasSensor(
   return false;
 }
 
+bool hasFeatures(const robot_calibration_msgs::CalibrationData& msg) {
+  for (size_t i = 0; i < msg.observations.size(); i++)
+  {
+    if (msg.observations[i].features.size() == 0) {
+      ROS_WARN_STREAM("Observation of sensor " << msg.observations[i].sensor_name << " doesn't have any features'");
+      return false;
+    }
+  }
+  return true;
+}
+
 int Optimizer::optimize(OptimizationParams& params,
                         std::vector<robot_calibration_msgs::CalibrationData> data,
                         bool progress_to_stdout)
@@ -138,6 +149,11 @@ int Optimizer::optimize(OptimizationParams& params,
   // For each sample of data:
   for (size_t i = 0; i < data.size(); ++i)
   {
+    // check if data contains any observations
+    if(data[i].observations.size() == 0) {
+      ROS_WARN_STREAM("Sample " << i << " doesn't contain any observations. This might be an error of the respective feature finder.");
+      continue;
+    }
     for (size_t j = 0; j < params.error_blocks.size(); ++j)
     {
       if (params.error_blocks[j].type == "camera3d_to_arm")
@@ -152,7 +168,7 @@ int Optimizer::optimize(OptimizationParams& params,
         std::string arm_name = static_cast<std::string>(params.error_blocks[j].params["arm"]);
 
         // Check that this sample has the required features/observations
-        if (!hasSensor(data[i], camera_name) || !hasSensor(data[i], arm_name))
+        if (!hasSensor(data[i], camera_name) || !hasSensor(data[i], arm_name) || !hasFeatures(data[i]))
           continue;
 
         // Create the block
@@ -211,7 +227,7 @@ int Optimizer::optimize(OptimizationParams& params,
         std::string arm_name = static_cast<std::string>(params.error_blocks[j].params["arm"]);
 
         // Check that this sample has the required features/observations
-        if (!hasSensor(data[i], camera_name) || !hasSensor(data[i], arm_name))
+        if (!hasSensor(data[i], camera_name) || !hasSensor(data[i], arm_name) || !hasFeatures(data[i]))
           continue;
 
         // Create the block
@@ -264,7 +280,7 @@ int Optimizer::optimize(OptimizationParams& params,
         std::string ground_name = static_cast<std::string>(params.error_blocks[j].params["ground"]);
 
         // Check that this sample has the required features/observations
-        if (!hasSensor(data[i], camera_name) || !hasSensor(data[i], ground_name))
+        if (!hasSensor(data[i], camera_name) || !hasSensor(data[i], ground_name) || !hasFeatures(data[i]))
           continue;
 
         // Create the block
