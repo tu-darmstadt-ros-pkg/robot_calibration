@@ -34,6 +34,7 @@ class CapturePoses:
         if len(self.last_state_.joint_states.name) == 0:
             print('Joint state is empty. Can\'t save it.')
         else:
+            self.last_state_.joint_states.header.seq = self.count
             self.bag.write('calibration_joint_states', self.last_state_)
             self.count += 1
             print("-- Saving pose %d" % self.count)
