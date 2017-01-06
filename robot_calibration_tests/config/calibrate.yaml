@@ -13,21 +13,21 @@ free_params:
  - arm_joint_2
  - sensor_head_pitch_joint
  - sensor_head_yaw_joint
-free_frames:
- - name: arm_rgbd_cam_rgb_joint
-   x: true
-   y: true
-   z: true
-   roll: true
-   pitch: true
-   yaw: true
- - name: chilitag_base_joint
-   x: true
-   y: true
-   z: true
-   roll: true
-   pitch: true
-   yaw: true
+#free_frames:
+# - name: arm_rgbd_cam_rgb_joint
+#   x: true
+#   y: true
+#   z: true
+#   roll: true
+#   pitch: true
+#   yaw: true
+# - name: chilitag_base_joint
+#   x: true
+#   y: true
+#   z: true
+#   roll: true
+#   pitch: true
+#   yaw: true
 error_blocks:
  - name: hand_eye
    type: camera2d_to_arm
