@@ -9,6 +9,7 @@ ChilitagFinder2D::ChilitagFinder2D(ros::NodeHandle & nh) :
 {
   ROS_INFO_STREAM("Starting Chilitag finder 2D!");
   // Setup Scriber
+
   image_sub_ = nh.subscribe("image", 1, &ChilitagFinder2D::cameraCallback, this);
 
   detector_.setFilter(0, 0);
@@ -29,7 +30,8 @@ ChilitagFinder2D::ChilitagFinder2D(ros::NodeHandle & nh) :
   nh.param<std::string>("chain_sensor_name", chain_sensor_name_, "arm");
 
   // Publish where chilitags were seen
-  tag_pub_ = nh.advertise<sensor_msgs::Image>("chilitags", 10);
+  image_transport::ImageTransport it(nh);
+  tag_pub_ = it.advertise("chilitags", 10);
   tag_pose_pub_ = nh.advertise<visualization_msgs::MarkerArray>("tag_poses", 10);
 
   // Setup to get camera depth info

@@ -31,6 +31,8 @@
 
 #include <ros/ros.h>
 #include <sensor_msgs/Image.h>
+#include <image_transport/image_transport.h>
+
 #include <robot_calibration/capture/feature_finder.h>
 #include <robot_calibration_msgs/CalibrationData.h>
 #include <robot_calibration/capture/rgb_camera.h>
@@ -67,7 +69,7 @@ private:
   void publishTagPoses(const std::vector<geometry_msgs::PointStamped>& features);
 
   ros::Subscriber image_sub_;  /// Incoming sensor_msgs::Image
-  ros::Publisher tag_pub_;   /// Outgoing sensor_msgs::Image
+  image_transport::Publisher tag_pub_;   /// Outgoing sensor_msgs::Image
   ros::Publisher tag_pose_pub_;
 
   bool waiting_;

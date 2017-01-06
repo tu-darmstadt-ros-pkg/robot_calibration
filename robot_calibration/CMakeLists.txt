@@ -42,6 +42,7 @@ find_package(catkin REQUIRED
     std_msgs
     tf
     visualization_msgs
+    image_transport
 )
 
 catkin_package(
