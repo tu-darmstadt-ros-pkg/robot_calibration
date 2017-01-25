@@ -85,6 +85,31 @@ double CalibrationOffsetParser::get(const std::string name) const
   return 0.0;
 }
 
+bool CalibrationOffsetParser::applyCorrection(const std::string name, KDL::Frame& pose) const {
+  // Don't bother with following computation if this isn't a calibrated frame.
+  bool has_offset = false;
+  for (size_t i = 0; i < frame_names_.size(); ++i)
+  {
+    if (frame_names_[i] == name)
+    {
+      has_offset = true;
+      break;
+    }
+  }
+
+  if (!has_offset)
+    return false;
+
+  double z, y, x;
+  pose.M.GetEulerZYX(z, y, x);
+  double z_offset = get(std::string(name).append("_c"));
+  double y_offset = get(std::string(name).append("_b"));
+  double x_offset = get(std::string(name).append("_a"));
+  pose.M = KDL::Rotation::EulerZYX(z+z_offset, y+y_offset, x+x_offset);
+
+  return true;
+}
+
 bool CalibrationOffsetParser::getFrame(const std::string name, KDL::Frame& offset) const
 {
   // Don't bother with following computation if this isn't a calibrated frame.
@@ -176,6 +201,75 @@ std::vector<double> getVector3(TiXmlElement* xml, std::string child_name, std::s
   return splitCast(*attrib_str, ' ');
 }
 
+std::string CalibrationOffsetParser::get_file_contents(const char *filename)
+{
+  std::ifstream in(filename, std::ios::in | std::ios::binary);
+  if (in)
+  {
+    std::string contents;
+    in.seekg(0, std::ios::end);
+    contents.resize(in.tellg());
+    in.seekg(0, std::ios::beg);
+    in.read(&contents[0], contents.size());
+    in.close();
+    return(contents);
+  }
+  throw(errno);
+}
+
+std::string CalibrationOffsetParser::writeXacro(const std::string& calibration_str) {
+  TiXmlDocument xml_doc;
+  xml_doc.Parse(calibration_str.c_str());
+  TiXmlElement *robot_xml = xml_doc.FirstChildElement("robot");
+  if (!robot_xml)
+  {
+    robot_xml = new TiXmlElement("robot");
+    robot_xml->SetAttribute("name", "calibration");
+    xml_doc.InsertEndChild(*robot_xml);
+  }
+
+  /*
+   * Joint offsets
+   */
+
+  // Create entry for each joint
+  for (unsigned int i = 0; i < parameter_names_.size(); i++) {
+    std::string name = parameter_names_[i];
+    double offset = parameter_offsets_[i];
+    // find correct xacro property
+    TiXmlElement* prop_xml = NULL;
+    for (TiXmlElement* iter_prop_xml = robot_xml->FirstChildElement("xacro:property"); iter_prop_xml; iter_prop_xml = iter_prop_xml->NextSiblingElement("xacro:property")) {
+      const char * name_str = iter_prop_xml->Attribute("name");
+      if (!name_str) {
+        ROS_WARN("Found xacro property without name!");
+      } else {
+        if (strcmp(name_str, (name + "_offset").c_str()) == 0) {
+          prop_xml = iter_prop_xml;
+          break;
+        }
+      }
+    }
+    if (!prop_xml) {
+      prop_xml = new TiXmlElement("xacro:property");
+      prop_xml->SetAttribute("name", name + "_offset");
+    }
+    const char* value_str = prop_xml->Attribute("value");
+    double current_offset = 0.0;
+    if (value_str) {
+      try {
+        current_offset = boost::lexical_cast<double>(value_str);
+      } catch (boost::bad_lexical_cast) {
+        ROS_WARN_STREAM("Bad lexical cast: " << value_str << " is not a double.");
+      }
+    }
+    double new_offset = current_offset + offset;
+
+
+  }
+
+  return "";
+}
+
 std::string CalibrationOffsetParser::getXacro(const std::string& urdf) {
   TiXmlDocument xml_doc;
   xml_doc.Parse(urdf.c_str());
@@ -217,10 +311,7 @@ std::string CalibrationOffsetParser::getXacro(const std::string& urdf) {
         return "";
       }
       double sign = axes[axis_idx];
-      // add offset * sign to current offset
-      std::vector<double> rpy = getVector3(joint_xml, "origin", "rpy");
-      double current_pos = rpy[axis_idx];
-      double new_offset = current_pos + sign * offset;
+      double new_offset = sign * offset;
       // create entry
       file << "  <xacro:property name=\"" << name << "_offset\" value=\"" << new_offset << "\"/>" << std::endl << std::endl;
     }

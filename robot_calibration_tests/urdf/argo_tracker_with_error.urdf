@@ -240,9 +240,9 @@
   </transmission>
   <link name="flipper_link_1">
     <inertial>
-      <origin rpy="0 0 0" xyz="0.24 0.0 0.0"/>
-      <mass value="1.0"/>
-      <inertia ixx="0.00544839834167" ixy="0.0" ixz="0.0" iyy="0.0234296483417" iyz="0.0" izz="0.0236854166667"/>
+      <origin rpy="0 0 0" xyz="0.37 0.0 0.0"/>
+      <mass value="10.0"/>
+      <inertia ixx="0.0544839834167" ixy="0.0" ixz="0.0" iyy="0.0342964834167" iyz="0.0" izz="0.0368541666667"/>
     </inertial>
     <origin rpy="0 0 0" xyz="0 0 0"/>
     <visual>
@@ -339,7 +339,7 @@
   <joint name="flipper_joint_1" type="revolute">
     <origin rpy="0 0 0" xyz="-0.071 0 -0.09"/>
     <axis xyz="0 1 0"/>
-    <limit effort="10000" lower="-0.872664625997" upper="0.523598775598" velocity="1.91986217719"/>
+    <limit effort="10000" lower="-0.872664625997" upper="0.523598775598" velocity="0.523598775598"/>
     <!--      <safety_controller soft_lower_limit="${-25 * M_PI / 180}"
                          soft_upper_limit="${45 * M_PI / 180}"
                          k_position="${100}"
@@ -360,9 +360,9 @@
   </transmission>
   <link name="chassis_link">
     <inertial>
-      <origin rpy="0 0 0" xyz="-0.25 0.0 -0.05"/>
+      <origin rpy="0 0 0" xyz="-0.1 0.0 -0.05"/>
       <mass value="30"/>
-      <inertia ixx="0.725" ixy="0.0" ixz="0.0" iyy="1.189" iyz="0.0" izz="1.714"/>
+      <inertia ixx="0.725" ixy="0.0" ixz="0.0" iyy="0.725" iyz="0.0" izz="1.25"/>
     </inertial>
     <!--Primitives with materials need to be used before .dae, otherwise material does not get applied-->
     <visual>
@@ -569,8 +569,8 @@
     </sensor>
   </gazebo>
   <joint name="arm_joint_0" type="revolute">
-  <!-- <origin rpy="0 0 1.5707963268" xyz="0.12 0 0.24238"/> -->
-    <origin rpy="0 0 1.6707963268" xyz="0.12 0 0.24238"/>
+    <!--<origin rpy="0 0 1.5707963268" xyz="0.12 0 0.24238"/>-->
+    <origin rpy="0 0 1.5707963268" xyz="0.12 0 0.24238"/>
     <axis xyz="0 0 1"/>
     <limit effort="1000" lower="-3.14159265359" upper="3.14159265359" velocity="0.523598775598"/>
     <!--        <safety_controller soft_lower_limit="${-168 * M_PI / 180}"
@@ -623,8 +623,7 @@
     </collision>
   </link>
   <joint name="arm_joint_1" type="revolute">
-  <!--     <origin rpy="0 0 0" xyz="-0.067 0.0 0.06"/> -->
-    <origin rpy="0.1 0 0" xyz="-0.067 0.0 0.06"/>
+    <origin rpy="0 0 0" xyz="-0.067 0.0 0.06"/>
     <axis xyz="1 0 0"/>
     <limit effort="1000" lower="0.0" upper="3.14159265359" velocity="0.523598775598"/>
     <!--        <safety_controller soft_lower_limit="${-168 * M_PI / 180}"
@@ -657,8 +656,8 @@
     </collision>
   </link>
   <joint name="arm_joint_2" type="revolute">
-     <!-- <origin rpy=" 0 0 0" xyz="0.022 0.551 0.0"/> -->
-    <origin rpy=" 0.1 0 0" xyz="0.022 0.551 0.0"/>
+  <!--     <origin rpy="0 0 0" xyz="0.022 0.551 0.0"/> -->
+    <origin rpy="0 0 0" xyz="0.022 0.551 0.0"/>
     <axis xyz="-1 0 0"/>
     <limit effort="1000" lower="0.0" upper="3.05432619099" velocity="0.523598775598"/>
     <!--        <safety_controller soft_lower_limit="${-168 * M_PI / 180}"
@@ -731,8 +730,7 @@
     <material>Gazebo/Grey</material>
   </gazebo>
   <joint name="sensor_head_pitch_joint" type="revolute">
-      <!--<origin rpy=" 0 0 0" xyz="0.105 -0.435 -0.013"/>-->
-    <origin rpy=" 0.1 0 0" xyz="0.105 -0.435 -0.013"/>
+    <origin rpy="0.0 0 0" xyz="0.105 -0.435 -0.013"/>
     <axis xyz="-1 0 0"/>
     <limit effort="1000" lower="-2.96705972839" upper="0.174532925199" velocity="0.506145483078"/>
     <!--        <safety_controller soft_lower_limit="${-168 * M_PI / 180}"
@@ -781,8 +779,7 @@
     <material>Gazebo/Grey</material>
   </gazebo>
   <joint name="sensor_head_yaw_joint" type="revolute">
-  <!--    <origin rpy="0 0 -1.5707963268" xyz="0.0405  0.052 0.0655"/> -->
-    <origin rpy="0 0 -1.4707963268" xyz="0.0405  0.052 0.0655"/>
+    <origin rpy="0 0 -1.5707963268" xyz="0.0405  0.052 0.0655"/>
     <axis xyz="0 0 1"/>
     <limit effort="1000" lower="-3.14159265359" upper="3.14159265359" velocity="0.506145483078"/>
     <!--        <safety_controller soft_lower_limit="${-168 * M_PI / 180}"
@@ -794,7 +791,7 @@
   </joint>
   <link name="arm_link_4">
     <inertial>
-      <origin rpy="0 0 0" xyz="0.052 0 0.1395"/>
+      <origin rpy="0 0 0" xyz="0.052 0 0.0655"/>
       <mass value="2.0"/>
       <inertia ixx="0.00642416666667" ixy="0.0" ixz="0.0" iyy="0.00835466666667" iyz="0.0" izz="0.0074775"/>
     </inertial>
@@ -861,8 +858,7 @@
       </collision>-->
   </link>
   <joint name="arm_zoom_cam_optical_joint" type="fixed">
-  <!--     <origin rpy="-1.5707963268 0.0 -1.5707963268" xyz="0 0 0"/> -->
-    <origin rpy="-1.5807963268 0.01 -1.5807963268" xyz="0.003 0.002 0.001"/>
+    <origin rpy="-1.5707963268 0.0 -1.5707963268" xyz="0 0 0"/>
     <parent link="arm_zoom_cam_link"/>
     <child link="arm_zoom_cam_optical_frame"/>
   </joint>
@@ -997,12 +993,25 @@
     </sensor>
   </gazebo>
   <joint name="arm_rgbd_cam_joint" type="fixed">
-    <origin rpy="1.5707963268 0 0" xyz="0.136 0.0413 0.0464"/>
+  <!--     <origin rpy="1.5707963268 0 0" xyz="0.136 0.0413 0.0464"/> -->
+    <origin rpy="1.6707963268 0.1 0.1" xyz="0.136 0.0413 0.0464"/>
     <parent link="arm_link_4"/>
     <child link="arm_rgbd_cam_link"/>
   </joint>
   <link name="arm_rgbd_cam_link">
       </link>
+  <joint name="arm_rgbd_cam_rgb_joint" type="fixed">
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <parent link="arm_rgbd_cam_link"/>
+    <child link="arm_rgbd_cam_rgb_frame"/>
+  </joint>
+  <link name="arm_rgbd_cam_rgb_frame"/>
+  <joint name="arm_rgbd_cam_rgb_optical_joint" type="fixed">
+    <origin rpy="-1.571 0.000 -1.571" xyz="0 0 0"/>
+    <parent link="arm_rgbd_cam_rgb_frame"/>
+    <child link="arm_rgbd_cam_rgb_optical_frame"/>
+  </joint>
+  <link name="arm_rgbd_cam_rgb_optical_frame"/>
   <gazebo reference="arm_rgbd_cam_link">
     <sensor name="arm_rgbd_cam" type="depth">
       <update_rate>20</update_rate>
@@ -1014,7 +1023,7 @@
           <height>480</height>
         </image>
         <clip>
-          <near>0.5</near>
+          <near>0.1</near>
           <far>9</far>
         </clip>
       </camera>
@@ -1024,10 +1033,44 @@
         <depthImageTopicName>arm_rgbd_cam/depth/image_raw</depthImageTopicName>
         <depthImageCameraInfoTopicName>arm_rgbd_cam/depth/camera_info</depthImageCameraInfoTopicName>
         <pointCloudTopicName>arm_rgbd_cam/depth/points</pointCloudTopicName>
-        <frameName>arm_rgbd_cam_depth_optical_frame</frameName>
+        <frameName>arm_rgbd_cam_rgb_optical_frame</frameName>
       </plugin>
     </sensor>
   </gazebo>
+  <joint name="chilitag_base_joint" type="fixed">
+    <origin rpy="0 0 0" xyz="-0.068 -0.0 0.001"/>
+    <parent link="chassis_link"/>
+    <child link="chilitag_base_link"/>
+  </joint>
+  <link name="chilitag_base_link">
+    </link>
+  <joint name="chilitag4_joint" type="fixed">
+    <origin rpy="0 0 0" xyz="-0.03 0.1 0.0"/>
+    <parent link="chilitag_base_link"/>
+    <child link="chilitag4_link"/>
+  </joint>
+  <link name="chilitag4_link">      
+    </link>
+  <gazebo reference="chilitag4_link">
+    </gazebo>
+  <joint name="chilitag5_joint" type="fixed">
+    <origin rpy="0 0 0" xyz="-0.18 -0.05 0.0"/>
+    <parent link="chilitag_base_link"/>
+    <child link="chilitag5_link"/>
+  </joint>
+  <link name="chilitag5_link">      
+    </link>
+  <gazebo reference="chilitag5_link">
+    </gazebo>
+  <joint name="chilitag7_joint" type="fixed">
+    <origin rpy="0 0 0" xyz="-0.285 -0.15 0.0"/>
+    <parent link="chilitag_base_link"/>
+    <child link="chilitag7_link"/>
+  </joint>
+  <link name="chilitag7_link">      
+    </link>
+  <gazebo reference="chilitag7_link">
+    </gazebo>
   <joint name="structure_addon_joint" type="fixed">
     <origin rpy="0 0 0" xyz="0 0 0.193"/>
     <parent link="base_link"/>
@@ -1035,24 +1078,7 @@
   </joint>
   <link name="structure_addons_link">
     <xacro:inertial_cube diameter="0.07" mass="0.1"/>
-    <!--<visual>
-      <origin xyz="-0.0 0.0 0.0" rpy="0 0 0"/>
-      <geometry>
-      <box size="${0.20 * box_scale_factor} ${0.1 * box_scale_factor} ${0.2 * box_scale_factor}"/>
-      </geometry>
-      <material name="Red">
-      <color rgba="0.6 0.0 0.0 1"/>
-      </material>
-      </visual>
-      
-      <collision>
-      <origin xyz="-0.0 0.0 0.0" rpy="0 0 0"/>
-      <geometry>
-      <box size="0.20 0.1 0.2"/>
-      </geometry>
-      </collision>
-      -->
-    <!--Lowest box-->
+    <!--Lowest box, goes before chilitags because material has to be set for rviz-->
     <visual>
       <origin rpy="0 0 -1.5707963268" xyz="-0.13 0 -0.15"/>
       <geometry>
@@ -1061,6 +1087,24 @@
       <material name="DarkGrey">
         <color rgba="0.3 0.3 0.3 1"/>
       </material>
+    </visual>
+    <visual>
+      <origin rpy="0 -1.57079632679 0" xyz="0.024                      0.1                      0.001"/>
+      <geometry>
+        <mesh filename="package://hector_chilitag_description/meshes/chilitag4.dae" scale="0.05 0.05 0.05"/>
+      </geometry>
+    </visual>
+    <visual>
+      <origin rpy="0 -1.57079632679 0" xyz="-0.126                      -0.05                      0.001"/>
+      <geometry>
+        <mesh filename="package://hector_chilitag_description/meshes/chilitag5.dae" scale="0.05 0.05 0.05"/>
+      </geometry>
+    </visual>
+    <visual>
+      <origin rpy="0 -1.57079632679 0" xyz="-0.231                      -0.15                      0.001"/>
+      <geometry>
+        <mesh filename="package://hector_chilitag_description/meshes/chilitag7.dae" scale="0.05 0.05 0.05"/>
+      </geometry>
     </visual>
     <!--ATEX Bottle/Box-->
     <collision>
@@ -1158,7 +1202,7 @@
       -->
   </link>
   <gazebo reference="structure_addons_link">
-    <material>Gazebo/Grey</material>
+    <!--<material>Gazebo/Grey</material>-->
     <mu1>0.0</mu1>
     <mu2>0.0</mu2>
     <kp>1000000.0</kp>
@@ -1244,9 +1288,9 @@
         </geometry>
       </visual>-->
     <collision>
-      <origin rpy="0 1.5707963268 0" xyz="-0.01 0 0.01"/>
+      <origin rpy="0 0 0" xyz="0.0 0 0.08"/>
       <geometry>
-        <cylinder length="0.12" radius="0.05"/>
+        <cylinder length="0.145" radius="0.1"/>
       </geometry>
     </collision>
   </link>
@@ -1387,201 +1431,6 @@
       <robotNamespace>spin_lidar_control</robotNamespace>
       <joints>spin_lidar_spin_joint</joints>
     </plugin>
-  </gazebo>
-  <joint name="chilitag_base_joint" type="fixed">
-  <!--     <origin rpy="0 0 0" xyz="-0.068 0 0"/> -->
-    <origin rpy="0.05 0.04 0.03" xyz="-0.07 0.001 0.001"/>
-    <parent link="chassis_link"/>
-    <child link="chilitag_base_link"/>
-  </joint>
-  <link name="chilitag_base_link">
-    <origin rpy="0 0 0" xyz="-0.0 0.0 0.0"/>
-  </link>
-  <joint name="chilitag4_joint" type="fixed">
-    <origin rpy="0 0 0" xyz="-0.03 0.1 0.0"/>
-    <parent link="chilitag_base_link"/>
-    <child link="chilitag4_link"/>
-  </joint>
-  <link name="chilitag4_link">
-    <inertial>
-      <origin xyz="0 0 0"/>
-      <mass value="0.01"/>
-      <inertia ixx="0.00000001" ixy="0.0" ixz="0.0" iyy="0.00000001" iyz="0.0" izz="0.00000001"/>
-    </inertial>
-    <visual>
-      <origin rpy="0 -1.57079632679 0" xyz="0 0 0"/>
-      <geometry>
-        <mesh filename="package://hector_chilitag_description/meshes/chilitag4.dae" scale="1 1.66 1.66"/>
-      </geometry>
-    </visual>
-    <collision>
-      <origin rpy="0 -1.57079632679 0" xyz="0 0 0"/>
-      <geometry>
-        <mesh filename="package://hector_chilitag_description/meshes/chilitag4.dae" scale="1 1.66 1.66"/>
-      </geometry>
-    </collision>
-  </link>
-  <joint name="chilitag4_background_joint" type="fixed">
-    <origin rpy="0 0 0" xyz="0 0 -0.001"/>
-    <parent link="chilitag4_link"/>
-    <child link="chilitag4_background_link"/>
-  </joint>
-  <link name="chilitag4_background_link">
-    <inertial>
-      <origin xyz="0 0 0"/>
-      <mass value="0.01"/>
-      <inertia ixx="0.00000001" ixy="0.0" ixz="0.0" iyy="0.00000001" iyz="0.0" izz="0.00000001"/>
-    </inertial>
-    <visual>
-      <origin rpy="0 0 0" xyz="0 0 0"/>
-      <geometry>
-        <box size="0.065 0.065 0.001"/>
-      </geometry>
-    </visual>
-    <collision>
-      <origin rpy="0 0 0" xyz="0 0 0"/>
-      <geometry>
-        <box size="0.065 0.065 0.001"/>
-      </geometry>
-    </collision>
-  </link>
-  <gazebo reference="chilitag4_link">
-    <!--      
-      <material>artag/${name}</material>
-      <turnGravityOff>false</turnGravityOff>
-      <static>false</static>
-      -->
-  </gazebo>
-  <gazebo reference="chilitag4_background_link">
-    <material>Gazebo/White</material>
-    <!--
-      <turnGravityOff>false</turnGravityOff>
-      <static>false</static>
-      -->
-  </gazebo>
-  <joint name="chilitag5_joint" type="fixed">
-    <origin rpy="0 0 0" xyz="-0.18 -0.05 0"/>
-    <parent link="chilitag_base_link"/>
-    <child link="chilitag5_link"/>
-  </joint>
-  <link name="chilitag5_link">
-    <inertial>
-      <origin xyz="0 0 0"/>
-      <mass value="0.01"/>
-      <inertia ixx="0.00000001" ixy="0.0" ixz="0.0" iyy="0.00000001" iyz="0.0" izz="0.00000001"/>
-    </inertial>
-    <visual>
-      <origin rpy="0 -1.57079632679 0" xyz="0 0 0"/>
-      <geometry>
-        <mesh filename="package://hector_chilitag_description/meshes/chilitag5.dae" scale="1 1.66 1.66"/>
-      </geometry>
-    </visual>
-    <collision>
-      <origin rpy="0 -1.57079632679 0" xyz="0 0 0"/>
-      <geometry>
-        <mesh filename="package://hector_chilitag_description/meshes/chilitag5.dae" scale="1 1.66 1.66"/>
-      </geometry>
-    </collision>
-  </link>
-  <joint name="chilitag5_background_joint" type="fixed">
-    <origin rpy="0 0 0" xyz="0 0 -0.001"/>
-    <parent link="chilitag5_link"/>
-    <child link="chilitag5_background_link"/>
-  </joint>
-  <link name="chilitag5_background_link">
-    <inertial>
-      <origin xyz="0 0 0"/>
-      <mass value="0.01"/>
-      <inertia ixx="0.00000001" ixy="0.0" ixz="0.0" iyy="0.00000001" iyz="0.0" izz="0.00000001"/>
-    </inertial>
-    <visual>
-      <origin rpy="0 0 0" xyz="0 0 0"/>
-      <geometry>
-        <box size="0.065 0.065 0.001"/>
-      </geometry>
-    </visual>
-    <collision>
-      <origin rpy="0 0 0" xyz="0 0 0"/>
-      <geometry>
-        <box size="0.065 0.065 0.001"/>
-      </geometry>
-    </collision>
-  </link>
-  <gazebo reference="chilitag5_link">
-    <!--      
-      <material>artag/${name}</material>
-      <turnGravityOff>false</turnGravityOff>
-      <static>false</static>
-      -->
-  </gazebo>
-  <gazebo reference="chilitag5_background_link">
-    <material>Gazebo/White</material>
-    <!--
-      <turnGravityOff>false</turnGravityOff>
-      <static>false</static>
-      -->
-  </gazebo>
-  <joint name="chilitag7_joint" type="fixed">
-    <origin rpy="0 0 0" xyz="-0.285 -0.15 0"/>
-    <parent link="chilitag_base_link"/>
-    <child link="chilitag7_link"/>
-  </joint>
-  <link name="chilitag7_link">
-    <inertial>
-      <origin xyz="0 0 0"/>
-      <mass value="0.01"/>
-      <inertia ixx="0.00000001" ixy="0.0" ixz="0.0" iyy="0.00000001" iyz="0.0" izz="0.00000001"/>
-    </inertial>
-    <visual>
-      <origin rpy="0 -1.57079632679 0" xyz="0 0 0"/>
-      <geometry>
-        <mesh filename="package://hector_chilitag_description/meshes/chilitag7.dae" scale="1 1.66 1.66"/>
-      </geometry>
-    </visual>
-    <collision>
-      <origin rpy="0 -1.57079632679 0" xyz="0 0 0"/>
-      <geometry>
-        <mesh filename="package://hector_chilitag_description/meshes/chilitag7.dae" scale="1 1.66 1.66"/>
-      </geometry>
-    </collision>
-  </link>
-  <joint name="chilitag7_background_joint" type="fixed">
-    <origin rpy="0 0 0" xyz="0 0 -0.001"/>
-    <parent link="chilitag7_link"/>
-    <child link="chilitag7_background_link"/>
-  </joint>
-  <link name="chilitag7_background_link">
-    <inertial>
-      <origin xyz="0 0 0"/>
-      <mass value="0.01"/>
-      <inertia ixx="0.00000001" ixy="0.0" ixz="0.0" iyy="0.00000001" iyz="0.0" izz="0.00000001"/>
-    </inertial>
-    <visual>
-      <origin rpy="0 0 0" xyz="0 0 0"/>
-      <geometry>
-        <box size="0.065 0.065 0.001"/>
-      </geometry>
-    </visual>
-    <collision>
-      <origin rpy="0 0 0" xyz="0 0 0"/>
-      <geometry>
-        <box size="0.065 0.065 0.001"/>
-      </geometry>
-    </collision>
-  </link>
-  <gazebo reference="chilitag7_link">
-    <!--      
-      <material>artag/${name}</material>
-      <turnGravityOff>false</turnGravityOff>
-      <static>false</static>
-      -->
-  </gazebo>
-  <gazebo reference="chilitag7_background_link">
-    <material>Gazebo/White</material>
-    <!--
-      <turnGravityOff>false</turnGravityOff>
-      <static>false</static>
-      -->
   </gazebo>
 </robot>
 

@@ -63,6 +63,8 @@ public:
    *  \returns True if there is an offset to apply, false if otherwise.
    */
   bool getFrame(const std::string name, KDL::Frame& offset) const;
+  bool applyCorrection(const std::string name, KDL::Frame &pose) const;
+
 
   /** \returns The number of free parameters being parsed */
   int size();
@@ -73,6 +75,8 @@ public:
   /** \brief Update the urdf with the new offsets */
   std::string updateURDF(const std::string& urdf);
 
+  std::string get_file_contents(const char *filename);
+  std::string writeXacro(const std::string& calibration_str);
   std::string getXacro(const std::string& urdf);
 
 private:

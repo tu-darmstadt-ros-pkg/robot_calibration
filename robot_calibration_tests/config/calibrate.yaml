@@ -8,19 +8,19 @@ models:
    type: camera2d
    frame: arm_rgbd_cam_rgb_optical_frame
 free_params:
- - arm_joint_0
- - arm_joint_1
- - arm_joint_2
- - sensor_head_pitch_joint
- - sensor_head_yaw_joint
-#free_frames:
-# - name: arm_rgbd_cam_rgb_joint
-#   x: true
-#   y: true
-#   z: true
-#   roll: true
-#   pitch: true
-#   yaw: true
+  - arm_joint_0
+# - arm_joint_1
+# - arm_joint_2
+# - sensor_head_pitch_joint
+# - sensor_head_yaw_joint
+free_frames:
+ - name: arm_rgbd_cam_rgb_joint
+   x: false
+   y: false
+   z: false
+   roll: true
+   pitch: true
+   yaw: true
 # - name: chilitag_base_joint
 #   x: true
 #   y: true

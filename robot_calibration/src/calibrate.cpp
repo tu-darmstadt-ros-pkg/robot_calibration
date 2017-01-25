@@ -326,11 +326,13 @@ int main(int argc, char** argv)
     nh.param<std::string>("xacro_save_path", xacro_save_path, "");
     if (xacro_save_path != "") {
       ROS_INFO_STREAM("Saving calibration to xacro in: " << xacro_save_path);
-      std::string xacro_string = opt.getOffsets()->getXacro(description_msg.data);
+      std::string calibration_str = opt.getOffsets()->get_file_contents(xacro_save_path.c_str());
+      std::string xacro_string = opt.getOffsets()->writeXacro(calibration_str);
+      ROS_INFO_STREAM("Writing to xacro:\n" << xacro_string);
       std::ofstream file;
-      file.open(xacro_save_path);
-      file << xacro_string;
-      file.close();
+      //file.open(xacro_save_path);
+      //file << xacro_string;
+      //file.close();
     }
   }
 

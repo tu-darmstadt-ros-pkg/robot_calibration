@@ -120,12 +120,6 @@ KDL::Frame ChainModel::getChainFK(std::string frame_id, const CalibrationOffsetP
   for (size_t i = 0; i < chain.getNrOfSegments(); ++i)
   {
     std::string name = chain.getSegment(i).getJoint().getName();
-    KDL::Frame correction;
-
-    // Apply any frame calibration
-    if (offsets.getFrame(name, correction)) {
-      p_out = p_out * correction;
-    }
 
     // Apply any joint offset calibration
     if (chain.getSegment(i).getJoint().getType() != KDL::Joint::None)
@@ -135,7 +129,10 @@ KDL::Frame ChainModel::getChainFK(std::string frame_id, const CalibrationOffsetP
     }
     else
     {
-      p_out = p_out * chain.getSegment(i).pose(0.0);
+      KDL::Frame pose = chain.getSegment(i).pose(0.0);
+      // Apply any frame calibration
+      offsets.applyCorrection(name, pose);
+      p_out = p_out * pose;
     }
   }
   return p_out;
@@ -324,7 +321,7 @@ sensor_msgs::CameraInfo Camera2dModel::getCameraInfo() {
 
 KDL::Rotation rotation_from_axis_magnitude(const double x, const double y, const double z)
 {
-  double magnitude = sqrt(x*x + y*y + z*z);
+  /*double magnitude = sqrt(x*x + y*y + z*z);
 
   if (magnitude == 0.0)
     return KDL::Rotation::Quaternion(0.0, 0.0, 0.0, 1.0);
@@ -332,7 +329,8 @@ KDL::Rotation rotation_from_axis_magnitude(const double x, const double y, const
   return KDL::Rotation::Quaternion(x/magnitude * sin(magnitude/2.0),
                                    y/magnitude * sin(magnitude/2.0),
                                    z/magnitude * sin(magnitude/2.0),
-                                   cos(magnitude/2.0));
+                                   cos(magnitude/2.0));*/
+  return KDL::Rotation::EulerZYX(z, y, x);
 }
 
 void axis_magnitude_from_rotation(const KDL::Rotation& r, double& x, double& y, double& z)
