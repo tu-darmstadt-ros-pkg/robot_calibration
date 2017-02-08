@@ -217,10 +217,7 @@ std::string CalibrationOffsetParser::getXacro(const std::string& urdf) {
         return "";
       }
       double sign = axes[axis_idx];
-      // add offset * sign to current offset
-      std::vector<double> rpy = getVector3(joint_xml, "origin", "rpy");
-      double current_pos = rpy[axis_idx];
-      double new_offset = current_pos + sign * offset;
+      double new_offset = sign * offset;
       // create entry
       file << "  <xacro:property name=\"" << name << "_offset\" value=\"" << new_offset << "\"/>" << std::endl << std::endl;
     }
