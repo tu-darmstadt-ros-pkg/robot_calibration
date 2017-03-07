@@ -33,9 +33,9 @@ error_blocks:
    type: camera2d_to_arm
    camera: camera
    arm: arm
- - name: restrict_camera
-   type: outrageous
-   param: arm_rgbd_cam_rgb_joint
-   joint_scale: 0.0
-   position_scale: 0.1
-   rotation_scale: 0.1
+# - name: restrict_camera
+#   type: outrageous
+#   param: arm_rgbd_cam_rgb_joint
+#   joint_scale: 0.0
+#   position_scale: 0.1
+#   rotation_scale: 0.1

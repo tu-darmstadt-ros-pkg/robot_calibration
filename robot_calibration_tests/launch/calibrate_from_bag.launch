@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<launch>
+  <node pkg="robot_calibration" type="calibrate" name="robot_calibration" args="--from-bag /home/martin/Documents/bagfiles/argo_arm_calibration/fused.bag" output="screen" launch-prefix="">
+    <param name="xacro_save_path" value="$(find argo_tracker_description)/calibrations/arm_calibration.urdf.xacro"/>
+    <rosparam file="$(find robot_calibration_tests)/config/calibrate.yaml" command="load" />
+  </node>
+</launch>
