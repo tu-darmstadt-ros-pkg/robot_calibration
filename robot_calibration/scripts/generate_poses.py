@@ -11,8 +11,8 @@ from robot_calibration_msgs.msg import CaptureConfig
 
 bag_name = 'calibration_poses.bag'
 action_topic = '/combined_planner'
-frame_ids = ['chilitag{}_link'.format(i) for i in [4, 5]]
-poses_per_frame = 25
+frame_ids = ['chilitag{}_link'.format(i) for i in range(4)]
+poses_per_frame = 15
 
 client_timeout = 5
 request_timeout = 30
@@ -53,12 +53,12 @@ class CapturePoses:
                 self.last_state_.joint_states.position.append(position)
 
 
-def create_action_goal():
+def create_action_goal(frame):
     goal = argo_move_group_msgs.msg.ArgoCombinedPlanGoal()
     goal.object_type.data = "chilitag"
     goal.action_type.val = argo_move_group_msgs.msg.ActionCodes.SAMPLE_MOVE_ARM
     goal.target.header.frame_id = frame
-    goal.target.pose.position.z = 0.001
+    goal.target.pose.position.z = 0.05
     return goal
 
 
@@ -67,7 +67,9 @@ if __name__ == '__main__':
     # create action client
     client = actionlib.SimpleActionClient(action_topic, argo_move_group_msgs.msg.ArgoCombinedPlanAction)
     print("Waiting", client_timeout, "seconds for action server on topic", action_topic)
-    client.wait_for_server(rospy.Duration.from_sec(client_timeout)) #TODO warning if no connection
+    if not client.wait_for_server(rospy.Duration.from_sec(client_timeout)):
+      rospy.logerr("No connection to argo combined plan action server")
+      exit(0)
 
     # create bag manager
     with CapturePoses() as bag:
@@ -75,7 +77,7 @@ if __name__ == '__main__':
             print("## Generating", poses_per_frame, "poses for frame", frame)
             for i in range(poses_per_frame):
                 # send action
-                client.send_goal(create_action_goal())
+                client.send_goal(create_action_goal(frame))
                 print("Planning pose", i, ". Waiting", request_timeout, "seconds for the result.")
                 client.wait_for_result(rospy.Duration.from_sec(request_timeout))
                 result = client.get_result() #TODO catch none
