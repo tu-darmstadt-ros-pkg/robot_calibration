@@ -132,7 +132,6 @@ target_link_libraries(robot_calibration ${Boost_LIBRARIES}
                                         ${orocos_kdl_LIBRARIES}
                                        # ${CHILITAGS_LDFLAGS}
                                         ${chilitags_LIBRARIES})
-add_dependencies(robot_calibration robot_calibration_msgs_gencpp)
 
 add_executable(calibrate src/calibrate.cpp)
 target_link_libraries(calibrate robot_calibration)
