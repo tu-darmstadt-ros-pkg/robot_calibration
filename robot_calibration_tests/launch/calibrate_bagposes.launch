@@ -7,7 +7,7 @@
     <rosparam file="$(find robot_calibration_tests)/config/capture.yaml" command="load" />
     <rosparam file="$(find robot_calibration_tests)/config/calibrate.yaml" command="load" />
     
-    <remap from="~/features/chilitag_finder/image" to="/arm_rgbd_cam/rgb/image_raw"/>
+    <remap from="~/features/chilitag_finder/image" to="/arm_rgbd_cam/rgb/image_rect_color"/>
     <remap from="/head_camera/rgb/camera_info" to="/arm_rgbd_cam/rgb/camera_info" />
   </node>
 </launch>
