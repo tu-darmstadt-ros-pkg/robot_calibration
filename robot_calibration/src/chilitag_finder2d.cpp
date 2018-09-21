@@ -223,8 +223,8 @@ bool ChilitagFinder2D::findInternal(robot_calibration_msgs::CalibrationData * ms
         counter++;
 
         // top right
-        world.point.x = -marker_size_/2.0;
-        world.point.y = marker_size_/2.0;
+        world.point.x = marker_size_/2.0;
+        world.point.y = -marker_size_/2.0;
         world.point.z = 0;
 
         rgb.point.x = positions(1, 0);
@@ -251,8 +251,8 @@ bool ChilitagFinder2D::findInternal(robot_calibration_msgs::CalibrationData * ms
         counter++;
 
         // bottom left
-        world.point.x = marker_size_/2.0;
-        world.point.y = -marker_size_/2.0;
+        world.point.x = -marker_size_/2.0;
+        world.point.y = marker_size_/2.0;
         world.point.z = 0;
 
         rgb.point.x = positions(3, 0);

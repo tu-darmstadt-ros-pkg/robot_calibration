@@ -61,7 +61,9 @@ def create_action_goal(frame):
     goal.object_type.data = "chilitag"
     goal.action_type.val = argo_move_group_msgs.msg.ActionCodes.SAMPLE
     goal.target.header.frame_id = frame
-    goal.target.pose.position.z = 0.05
+    goal.target.pose.position.z = -0.0
+    goal.target.pose.orientation.x = 1
+    goal.target.pose.orientation.w = 0
     return goal
 
 
