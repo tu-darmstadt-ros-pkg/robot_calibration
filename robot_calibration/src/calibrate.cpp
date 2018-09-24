@@ -334,6 +334,16 @@ int main(int argc, char** argv)
     }
   }
 
+  // Load and update calibration YAML
+  {
+    std::string yaml_save_path;
+    nh.param<std::string>("yaml_save_path", yaml_save_path, "");
+    if (yaml_save_path != "") {
+      opt.getOffsets()->saveOffsetYAML(yaml_save_path);
+      ROS_INFO_STREAM("Saved calibration yaml to '" << yaml_save_path << "'.");
+    }
+  }
+
   // Save updated URDF
   {
     std::stringstream urdf_name;

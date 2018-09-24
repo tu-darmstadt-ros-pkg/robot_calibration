@@ -271,7 +271,7 @@ std::vector<geometry_msgs::PointStamped> Camera2dModel::project(
   // Get existing camera info
   if (data.observations[sensor_idx].ext_camera_info.camera_info.P.size() != 12)
     std::cerr << "Unexpected CameraInfo projection matrix size" << std::endl;
-  camera_info_ = data.observations[sensor_idx].ext_camera_info.camera_info;
+    camera_info_ = data.observations[sensor_idx].ext_camera_info.camera_info;
 
 //  double camera_fx = data.observations[sensor_idx].ext_camera_info.camera_info.P[CAMERA_INFO_P_FX_INDEX];
 //  double camera_fy = data.observations[sensor_idx].ext_camera_info.camera_info.P[CAMERA_INFO_P_FY_INDEX];

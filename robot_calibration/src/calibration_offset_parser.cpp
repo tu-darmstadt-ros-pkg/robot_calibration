@@ -18,6 +18,7 @@
 
 #include <ros/ros.h>
 #include <fstream>
+#include <yaml-cpp/yaml.h>
 
 #include <string>
 #include <map>
@@ -130,6 +131,32 @@ std::string CalibrationOffsetParser::getOffsetYAML()
     ss << std::endl;
   }
   return ss.str();
+}
+
+void CalibrationOffsetParser::saveOffsetYAML(std::string path)
+{
+  // Check if file exists
+  std::fstream fstream;
+  fstream.open(path, std::fstream::in | std::fstream::out);
+  if (!fstream) {
+    fstream.open(path,  std::fstream::in | std::fstream::out | std::fstream::trunc);
+  }
+
+  // Write calibration results
+  YAML::Node offsets = YAML::LoadFile(path); // TODO check if file exists
+  for (size_t i = 0; i < parameter_names_.size(); ++i)
+  {
+    const std::string& name = parameter_names_[i];
+    const double& offset = parameter_offsets_[i];
+    if (offsets[name]) {
+      double new_offset = offsets[name].as<double>() + offset;
+      offsets[name] = new_offset;
+    } else {
+      offsets[name] = offset;
+    }
+  }
+
+  fstream << offsets << std::endl;
 }
 
 std::vector<std::string> split(const std::string &s, char delim) {

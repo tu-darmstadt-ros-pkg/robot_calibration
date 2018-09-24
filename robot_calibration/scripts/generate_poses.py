@@ -62,6 +62,8 @@ def create_action_goal(frame):
     goal.action_type.val = argo_move_group_msgs.msg.ActionCodes.SAMPLE
     goal.target.header.frame_id = frame
     goal.target.pose.position.z = -0.0
+    # by default, the observation planner looks at the z-axis
+    # since the chilitag z-axis points inward, we need to rotate the target pose
     goal.target.pose.orientation.x = 1
     goal.target.pose.orientation.w = 0
     return goal

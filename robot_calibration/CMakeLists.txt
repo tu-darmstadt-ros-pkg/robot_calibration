@@ -8,6 +8,7 @@ endif()
 add_definitions(-std=c++11)
 
 find_package(Boost REQUIRED system thread)
+find_package(yaml-cpp)
 
 find_library(tinyxml_library tinyxml)
 if (tinyxml_library)
@@ -75,7 +76,9 @@ include_directories(include ${Boost_INCLUDE_DIRS}
                             ${catkin_INCLUDE_DIRS}
                             ${CERES_INCLUDES}
                             ${orocos_kdl_INCLUDE_DIRS}
-                            ${chilitags_INCLUDE_DIR})
+                            ${chilitags_INCLUDE_DIR}
+                            ${YAML_CPP_INCLUDE_DIRS}
+                            )
 link_directories(${orocos_kdl_LIBRARY_DIRS}) # this is a hack, will eventually be unneeded once orocos-kdl is fixed
 
 add_executable(calibrate_base src/calibrate_base.cpp)
@@ -131,7 +134,8 @@ target_link_libraries(robot_calibration ${Boost_LIBRARIES}
                                         ${tinyxml_LIBRARIES}
                                         ${orocos_kdl_LIBRARIES}
                                        # ${CHILITAGS_LDFLAGS}
-                                        ${chilitags_LIBRARIES})
+                                        ${chilitags_LIBRARIES}
+                                         ${YAML_CPP_LIBRARIES})
 
 add_executable(calibrate src/calibrate.cpp)
 target_link_libraries(calibrate robot_calibration)
