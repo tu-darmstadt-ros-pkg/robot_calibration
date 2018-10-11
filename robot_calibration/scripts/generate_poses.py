@@ -12,7 +12,7 @@ from robot_calibration_msgs.msg import CaptureConfig
 bag_name = 'calibration_poses.bag'
 action_topic = '/combined_planner'
 frame_ids = ['chilitag{}_link'.format(i) for i in [28, 30, 31, 32]]
-poses_per_frame = 15
+poses_per_frame = 10
 
 client_timeout = 5
 request_timeout = 30
