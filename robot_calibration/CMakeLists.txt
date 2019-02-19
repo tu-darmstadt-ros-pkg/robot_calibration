@@ -26,7 +26,7 @@ endif ()
 find_package(chilitags REQUIRED)
 
 find_package(orocos_kdl)
-find_package(Ceres REQUIRED)
+#find_package(Ceres REQUIRED)
 find_package(catkin REQUIRED
   COMPONENTS
     actionlib
@@ -44,6 +44,7 @@ find_package(catkin REQUIRED
     tf
     visualization_msgs
     image_transport
+    ceres_catkin
 )
 
 catkin_package(
@@ -64,9 +65,9 @@ catkin_package(
     std_msgs
     tf
     visualization_msgs
+    ceres_catkin
   DEPENDS
     Boost
-    Ceres
     orocos_kdl
   LIBRARIES
     robot_calibration
