@@ -27,7 +27,6 @@
   <build_depend>std_msgs</build_depend>
   <build_depend>tf</build_depend>
   <build_depend>ceres_catkin</build_depend>
-  <build_depend>libgflags-dev</build_depend>
   <build_depend>suitesparse</build_depend>
   <build_depend>protobuf-dev</build_depend>
   <build_depend>visualization_msgs</build_depend>
